@@ -290,6 +290,11 @@ button:disabled{opacity:.45; cursor:not-allowed;}
   padding:9px 12px; color:var(--ink); font-size:13px; box-shadow:var(--shadow);
   font-family:'Inter'; font-weight:600;
 }
+.hide-drafted{
+  display:inline-flex; align-items:center; gap:6px; flex:none;
+  font-size:12.5px; color:var(--muted); font-family:'Inter'; user-select:none; white-space:nowrap;
+}
+.hide-drafted input{accent-color:var(--accent); width:14px; height:14px;}
 
 /* draft tracker */
 .clock-banner{
@@ -547,6 +552,7 @@ code{background:var(--surface-2); padding:1px 5px; border-radius:4px; font-famil
     <select class="team-filter" id="teamFilter"></select>
     <input class="search" id="search" type="text" placeholder="Search player or team…">
     <button class="mic-btn" id="micBtn" type="button" title="Voice search">🎤</button>
+    <label class="hide-drafted"><input type="checkbox" id="hideDraftedToggle" checked> Hide drafted</label>
     <div class="spacer"></div>
     <div class="legend" title="Each player's tier is ranked against others at their own position, not the whole player pool">
       <span class="sw"><span class="dot" style="background:var(--tier1)"></span>T1 Elite</span>
@@ -672,7 +678,7 @@ code{background:var(--surface-2); padding:1px 5px; border-radius:4px; font-famil
     var id = PLAYER_IDS[key];
     if(!id) return avatarHtml(name, posGroup);
     var fallback = avatarHtml(name, posGroup).replace(/"/g, '&quot;');
-    return '<img class="avatar" style="object-fit:cover;" src="https://assets.nhle.com/mugs/nhl/latest/'+id+'@2x.png" alt="" '+
+    return '<img class="avatar" style="object-fit:cover;" src="https://assets.nhle.com/mugs/nhl/latest/'+id+'.png" alt="" '+
       'onerror="this.outerHTML=\''+fallback+'\'">';
   }
   function teamChipHtml(team){
@@ -933,6 +939,7 @@ code{background:var(--surface-2); padding:1px 5px; border-radius:4px; font-famil
     pickCounter: 0,
     posFilter: 'ALL',
     teamFilter: 'ALL',
+    hideDrafted: true,
     search: '',
     sortKey: 'vor',
     sortDir: -1
@@ -1309,6 +1316,8 @@ code{background:var(--surface-2); padding:1px 5px; border-radius:4px; font-famil
     } else if(state.teamFilter!=='ALL'){
       var wantIdx = parseInt(state.teamFilter,10);
       rows = rows.filter(function(p){ var d=state.draft[playerKey(p)]; return d && d.team===wantIdx; });
+    } else if(state.hideDrafted){
+      rows = rows.filter(function(p){ return !state.draft[playerKey(p)]; });
     }
     if(state.search){
       var q = state.search.toLowerCase();
@@ -1586,6 +1595,10 @@ code{background:var(--surface-2); padding:1px 5px; border-radius:4px; font-famil
   function wireToolbar(){
     document.getElementById('search').addEventListener('input', function(e){
       state.search = e.target.value;
+      render();
+    });
+    document.getElementById('hideDraftedToggle').addEventListener('change', function(e){
+      state.hideDrafted = e.target.checked;
       render();
     });
     wireVoiceSearch();
