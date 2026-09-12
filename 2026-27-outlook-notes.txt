@@ -1,0 +1,29 @@
+2026-27 FANTASY OUTLOOK NOTES (quick hitters, not exhaustive)
+
+- Mitch Marner (VGK): Signed-and-traded from Toronto to Vegas in an offseason deal (deal closed ~June 30, 2026); the 2025-26 stats in this CSV already reflect his full season with Vegas, so no team-abbreviation surprise here for 2026-27 either.
+
+- Alex Ovechkin (WSH): Re-signed a 1-year, $4.25M deal to stay in Washington for 2026-27 rather than retiring after passing Gretzky's goal record. Workload/ice-time could dip further as he ages, so treat his ADP with some caution.
+
+- Nikita Kucherov (TBL): Back-to-back Hart Trophy winner; extension talks with Tampa Bay are ongoing (GM Julien BriseBois says he expects Kucherov to stay long-term), but as of this writing it appears he has NOT yet signed a new long-term deal — worth double-checking contract status closer to your draft in case term/no-trade complications arise.
+
+- Macklin Celebrini (SJS): Sophomore breakout is real and already baked into this dataset (82 GP, 115 points, good peripherals) — being talked about as a legitimate first-round fantasy pick now, not just a prospect stash.
+
+- Matthew Schaefer (NYI): Won the Calder Trophy (rookie of the year) after his 59-point rookie season reflected in this file; expect a continued workload increase and possible power-play time bump in year two.
+
+- Gavin McKenna (TOR, incoming rookie): 2026 first-overall draft pick, posted eye-catching numbers in his final pre-NHL season (reported 51 points in 35 NCAA/junior games). He is NOT in this CSV since he has no 2025-26 NHL stats, but he's likely to be one of the most-drafted rookies in 2026-27 fantasy leagues if he makes Toronto's opening roster — flag as unverified/speculative for games-played projections.
+
+- Aleksander Barkov (FLA): Suffered a torn ACL/MCL early in the 2025-26 season (hence his very limited stats footprint if any this year) and is reportedly on track to be full-go for 2026-27 training camp. Verify health status close to your draft before assuming a full 82-game season.
+
+- Seth Jarvis (CAR): Underwent shoulder surgery in the 2026 offseason and is expected to miss roughly 4-6 months, putting a realistic return in the late-October to December window for 2026-27 — expect a slow start and reduced games played versus his 71-GP, 66-point 2025-26 season in this file.
+
+- Frederik Andersen (goalie): Listed on CAR in this CSV for his 2025-26 stats, but reporting indicates he is now with Edmonton for 2026-27 and expected to miss training camp with no announced return date — a real goaltending-timeshare risk in Edmonton if true; unverified exact new contract terms, so treat as developing.
+
+- Thatcher Demko (VAN, goalie): Returning from January hip surgery; reported to be on track for training camp but Vancouver has not fully committed to him as the guaranteed starter — a goalie timeshare/committee situation is possible early in 2026-27.
+
+- Elvis Merzlikins (CBJ, goalie): Had shoulder surgery after offseason discomfort; no firm Columbus return timeline as of the most recent reporting, which could open up more starts for Jet Greaves (already the higher-workload CBJ goalie in this dataset at 55 GP/26 W).
+
+- Logan Stankoven (CAR) and Egor Chinakhov (CBJ/PIT): Both named in recent fantasy previews as breakout candidates for 2026-27 coming off modest-but-promising 2025-26 point totals (44 and 42 points respectively in this file) — worth a speculative mid-to-late round look.
+
+- Darnell Nurse: Reported traded from Edmonton to San Jose (for Shakir Mukhamadullin and a depth piece) in the 2026 offseason — if this holds, his team abbreviation for 2026-27 drafts should be SJS, not EDM as listed for his 2025-26 season in this file.
+
+- General caveat: several of the above (Kucherov's exact contract status, McKenna's opening-night roster spot, Andersen's new team/contract, Nurse's trade) are drawn from web reporting dated mid-to-late 2026 and should be re-verified close to your actual draft date, since offseason/training-camp situations can still change.

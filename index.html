@@ -1,0 +1,1664 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ice Level — Fantasy Hockey Draft Board</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root{
+  --bg:#F5F7FA;
+  --surface:#FFFFFF;
+  --surface-2:#EDF1F5;
+  --ink:#101826;
+  --muted:#5B6B7C;
+  --faint:#8493A3;
+  --accent:#1C6FD1;
+  --accent-ink:#FFFFFF;
+  --accent-soft:#E3EEFC;
+  --good:#1E8E5A;
+  --good-soft:#E1F4EA;
+  --warn:#B45A00;
+  --warn-soft:#FCEBD6;
+  --danger:#C22E3A;
+  --danger-soft:#FBE2E4;
+  --line:#DCE3EA;
+  --shadow:0 1px 2px rgba(16,24,38,.06), 0 8px 24px -12px rgba(16,24,38,.18);
+  --tier1:#A9760B; --tier1-soft:#FBF0D6;
+  --tier2:#167A72; --tier2-soft:#DFF2F0;
+  --tier3:#6B57C9; --tier3-soft:#EAE6FA;
+  --tier4:#556B84; --tier4-soft:#E7ECF1;
+  --tier5:#8C6350; --tier5-soft:#F1E6DE;
+  --posC:#B0367A; --posC-soft:#F7E4EF;
+  --posLW:#1179A6; --posLW-soft:#DFF0F7;
+  --posRW:#C1650C; --posRW-soft:#FBE9D8;
+  --posD:#34618F; --posD-soft:#DCEAF4;
+  --posG:#8A7A1E; --posG-soft:#F2EFD7;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0B1622;
+    --surface:#121F2E;
+    --surface-2:#182838;
+    --ink:#E7EEF5;
+    --muted:#8DA0B3;
+    --faint:#5F7488;
+    --accent:#4C9AFF;
+    --accent-ink:#06111E;
+    --accent-soft:#173355;
+    --good:#3FBE85;
+    --good-soft:#123326;
+    --warn:#E3A34C;
+    --warn-soft:#3A2A0F;
+    --danger:#F0707C;
+    --danger-soft:#3A1620;
+    --line:#223447;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+    --tier1:#E3B23D; --tier1-soft:#3A2E10;
+    --tier2:#4FC9BE; --tier2-soft:#123330;
+    --tier3:#9C8AF0; --tier3-soft:#2A2350;
+    --tier4:#8FA6BE; --tier4-soft:#1E2A36;
+    --tier5:#C99180; --tier5-soft:#3A2620;
+    --posC:#E06BAF; --posC-soft:#3A1A2C;
+    --posLW:#3FB6E0; --posLW-soft:#10303A;
+    --posRW:#E2933E; --posRW-soft:#3A2712;
+    --posD:#6FA0D8; --posD-soft:#1B2A3A;
+    --posG:#D2C24A; --posG-soft:#34301A;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0B1622;
+  --surface:#121F2E;
+  --surface-2:#182838;
+  --ink:#E7EEF5;
+  --muted:#8DA0B3;
+  --faint:#5F7488;
+  --accent:#4C9AFF;
+  --accent-ink:#06111E;
+  --accent-soft:#173355;
+  --good:#3FBE85;
+  --good-soft:#123326;
+  --warn:#E3A34C;
+  --warn-soft:#3A2A0F;
+  --danger:#F0707C;
+  --danger-soft:#3A1620;
+  --line:#223447;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+  --tier1:#E3B23D; --tier1-soft:#3A2E10;
+  --tier2:#4FC9BE; --tier2-soft:#123330;
+  --tier3:#9C8AF0; --tier3-soft:#2A2350;
+  --tier4:#8FA6BE; --tier4-soft:#1E2A36;
+  --tier5:#C99180; --tier5-soft:#3A2620;
+  --posC:#E06BAF; --posC-soft:#3A1A2C;
+  --posLW:#3FB6E0; --posLW-soft:#10303A;
+  --posRW:#E2933E; --posRW-soft:#3A2712;
+  --posD:#6FA0D8; --posD-soft:#1B2A3A;
+  --posG:#D2C24A; --posG-soft:#34301A;
+}
+
+*{box-sizing:border-box;}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'Inter',system-ui,sans-serif;
+  font-size:14px;
+  line-height:1.5;
+}
+h1,h2,h3{
+  font-family:'Oswald',system-ui,sans-serif;
+  text-transform:uppercase;
+  letter-spacing:.03em;
+  text-wrap:balance;
+  margin:0;
+}
+.mono, .num, td.num, th.num{
+  font-family:'JetBrains Mono','IBM Plex Mono',monospace;
+  font-variant-numeric:tabular-nums;
+}
+::selection{background:var(--accent-soft);}
+
+.wrap{
+  max-width:1240px;
+  margin:0 auto;
+  padding:28px 24px 64px;
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+}
+
+/* header */
+.topbar{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:16px;
+  flex-wrap:wrap;
+  border-bottom:2px solid var(--ink);
+  padding-bottom:16px;
+}
+.brand{display:flex; flex-direction:column; gap:4px;}
+.brand .rink{font-size:11px; color:var(--accent); font-weight:600; letter-spacing:.12em; text-transform:uppercase;}
+.brand h1{font-size:30px; font-weight:700;}
+.brand .sub{color:var(--muted); font-size:13px; font-family:'Inter'; text-transform:none; letter-spacing:0;}
+
+.stat-chips{display:flex; gap:10px; flex-wrap:wrap;}
+.chip{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:8px 14px;
+  box-shadow:var(--shadow);
+  min-width:84px;
+}
+.chip .n{font-family:'Oswald'; font-size:22px; font-weight:600; line-height:1;}
+.chip .l{font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; margin-top:3px;}
+
+/* panels */
+details.panel{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:10px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+details.panel > summary{
+  list-style:none;
+  cursor:pointer;
+  padding:14px 18px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-family:'Oswald';
+  font-size:14px;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  color:var(--ink);
+  user-select:none;
+}
+details.panel > summary::-webkit-details-marker{display:none;}
+details.panel > summary::before{
+  content:'▸';
+  font-family:Inter;
+  color:var(--accent);
+  transition:transform .15s ease;
+  font-size:12px;
+}
+details.panel[open] > summary::before{transform:rotate(90deg);}
+details.panel > summary .hint{
+  font-family:'Inter'; text-transform:none; letter-spacing:0;
+  color:var(--muted); font-weight:400; font-size:12px; margin-left:auto;
+}
+.panel-body{padding:4px 18px 20px;}
+
+.field-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(120px,1fr));
+  gap:12px;
+}
+.field-grid.roster{grid-template-columns:repeat(auto-fill, minmax(90px,1fr));}
+label.field{display:flex; flex-direction:column; gap:5px;}
+label.field span{font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em;}
+label.field input{
+  background:var(--surface-2);
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:7px 9px;
+  color:var(--ink);
+  font-family:'JetBrains Mono';
+  font-size:13px;
+  width:100%;
+}
+label.field select{
+  background:var(--surface-2);
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:7px 9px;
+  color:var(--ink);
+  font-family:'Inter';
+  font-size:13px;
+  width:100%;
+}
+label.field input:focus-visible, button:focus-visible, .tab:focus-visible, input[type=text]:focus-visible, textarea:focus-visible, select:focus-visible{
+  outline:2px solid var(--accent);
+  outline-offset:1px;
+}
+.group-title{font-size:11px; font-weight:600; color:var(--accent); text-transform:uppercase; letter-spacing:.08em; margin:14px 0 8px;}
+.group-title:first-child{margin-top:4px;}
+
+textarea{
+  width:100%;
+  min-height:110px;
+  background:var(--surface-2);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:10px;
+  color:var(--ink);
+  font-family:'JetBrains Mono';
+  font-size:12.5px;
+  resize:vertical;
+}
+.import-row{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:10px;}
+.filehint{font-size:12px; color:var(--muted);}
+.outlook-list{margin:0; padding-left:20px; display:flex; flex-direction:column; gap:10px;}
+.outlook-list li{font-size:13px; line-height:1.55;}
+.outlook-list li::marker{color:var(--accent);}
+
+button{
+  font-family:'Inter';
+  font-weight:600;
+  font-size:13px;
+  border-radius:7px;
+  border:1px solid var(--line);
+  background:var(--surface-2);
+  color:var(--ink);
+  padding:8px 14px;
+  cursor:pointer;
+}
+button:hover{border-color:var(--faint);}
+button.primary{background:var(--accent); color:var(--accent-ink); border-color:var(--accent);}
+button.primary:hover{filter:brightness(1.06);}
+button.ghost{background:transparent;}
+button:disabled{opacity:.45; cursor:not-allowed;}
+
+/* toolbar */
+.toolbar{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.tabs{display:flex; gap:6px; background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:4px; box-shadow:var(--shadow);}
+.tab{
+  border:none; background:transparent; padding:6px 13px; border-radius:6px;
+  font-family:'Oswald'; font-size:12.5px; letter-spacing:.05em; text-transform:uppercase;
+  color:var(--muted); cursor:pointer;
+}
+.tab.active{background:var(--accent); color:var(--accent-ink);}
+.search{
+  flex:1; min-width:180px;
+  background:var(--surface); border:1px solid var(--line); border-radius:8px;
+  padding:9px 12px; color:var(--ink); font-size:13px; box-shadow:var(--shadow);
+}
+.toolbar .spacer{flex:1;}
+.legend{display:flex; gap:12px; flex-wrap:wrap; font-size:11px; color:var(--muted); align-items:center;}
+.legend .sw{display:inline-flex; align-items:center; gap:5px;}
+.dot{width:9px; height:9px; border-radius:2px; display:inline-block;}
+.team-filter{
+  min-width:150px; max-width:200px; flex:none;
+  background:var(--surface); border:1px solid var(--line); border-radius:8px;
+  padding:9px 12px; color:var(--ink); font-size:13px; box-shadow:var(--shadow);
+  font-family:'Inter'; font-weight:600;
+}
+
+/* draft tracker */
+.clock-banner{
+  display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  background:var(--accent-soft); border:1px solid var(--line); border-radius:9px;
+  padding:12px 16px; margin-bottom:16px;
+}
+.clock-banner .pick-num{font-family:'Oswald'; font-size:22px; font-weight:600; color:var(--accent); letter-spacing:.02em;}
+.clock-banner .round-label{color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.06em;}
+.clock-banner .on-team{font-family:'Oswald'; font-size:15px; text-transform:uppercase; letter-spacing:.03em; display:flex; align-items:center; gap:6px;}
+.my-team-badge{
+  font-size:9.5px; font-family:'Inter'; font-weight:700; background:var(--good); color:#fff;
+  padding:2px 6px; border-radius:4px; letter-spacing:.03em;
+}
+.team-name-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); gap:12px;}
+.draft-controls{margin-top:14px; display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;}
+.draft-controls label.field{max-width:220px;}
+
+.roster-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(230px,1fr)); gap:12px;}
+.roster-card{
+  background:var(--surface-2); border:1px solid var(--line); border-radius:8px; padding:12px 14px;
+}
+.roster-card.mine{box-shadow:0 0 0 1.5px var(--good) inset;}
+.roster-card h4{
+  font-family:'Oswald'; font-size:13px; letter-spacing:.03em; text-transform:uppercase;
+  display:flex; align-items:center; gap:6px; margin-bottom:8px;
+}
+.slot-row{padding:5px 0; border-bottom:1px solid var(--line);}
+.slot-row:last-child{border-bottom:none;}
+.slot-head{display:flex; justify-content:space-between; font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em;}
+.slot-fill{font-family:'JetBrains Mono'; font-variant-numeric:tabular-nums;}
+.slot-names{font-size:12.5px; color:var(--ink); margin-top:2px; line-height:1.4;}
+.slot-names .empty{color:var(--faint); font-style:italic;}
+
+td.team-select select{
+  background:var(--surface-2); border:1px solid var(--line); border-radius:6px;
+  padding:5px 8px; color:var(--ink); font-family:'Inter'; font-size:11.5px; font-weight:600; max-width:140px;
+}
+
+.draft-board-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:8px; max-height:520px;}
+table.draft-board{border-collapse:collapse; width:100%;}
+table.draft-board th{
+  position:sticky; top:0; z-index:2;
+  background:var(--surface-2); border-bottom:1px solid var(--line); border-left:1px solid var(--line);
+  padding:8px 10px; font-size:10.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted);
+  white-space:nowrap; font-family:'Oswald';
+}
+table.draft-board th.mine-col{color:var(--good);}
+table.draft-board th.rnd-col, table.draft-board td.rnd-col{
+  position:sticky; left:0; z-index:1; background:var(--surface-2);
+  border-right:1px solid var(--line); text-align:center; font-size:11px; color:var(--muted); font-weight:600;
+}
+table.draft-board th.rnd-col{ z-index:3; }
+table.draft-board td{
+  border:1px solid var(--line); padding:6px 8px; min-width:112px; text-align:center; vertical-align:middle;
+}
+td.db-cell.mine-col{border-left:3px solid var(--good);}
+td.db-cell.on-clock{box-shadow:0 0 0 2px var(--accent) inset; background:var(--accent-soft);}
+td.db-cell.filled{color:#fff;}
+td.db-cell.filled .db-pick{color:rgba(255,255,255,.75);}
+td.db-cell.filled .pos-badge{background:rgba(0,0,0,.22); color:#fff; border-color:transparent;}
+.db-pick{font-size:9.5px; color:var(--faint); font-family:'JetBrains Mono';}
+.db-name{font-size:12px; font-weight:600; margin:2px 0; line-height:1.25;}
+.db-empty{color:var(--faint);}
+.db-onclock{font-size:10px; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:.03em;}
+
+/* table */
+.board{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:10px;
+  box-shadow:var(--shadow);
+  overflow:auto;
+  max-height:70vh;
+}
+table{border-collapse:collapse; width:100%; min-width:920px;}
+thead th{
+  position:sticky; top:0; z-index:2;
+  background:var(--surface-2);
+  border-bottom:1px solid var(--line);
+  text-align:left;
+  padding:10px 12px;
+  font-size:10.5px;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  cursor:pointer;
+  white-space:nowrap;
+}
+thead th.num, td.num{text-align:right;}
+thead th:hover{color:var(--ink);}
+thead th.sorted{color:var(--accent);}
+tbody tr{border-bottom:1px solid var(--line);}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:var(--surface-2);}
+tbody tr.drafted{opacity:.42;}
+tbody tr.mine{background:var(--good-soft);}
+tbody tr.mine:hover{background:var(--good-soft);}
+td{padding:8px 12px; white-space:nowrap;}
+td.name{font-weight:600; white-space:normal; min-width:210px;}
+td.name .name-row{display:flex; align-items:center; gap:8px;}
+td.name .team-chip{
+  display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px;
+  border-radius:5px; font-family:'Oswald'; font-size:8px; font-weight:700; color:#fff; letter-spacing:.02em;
+  flex:none;
+}
+td.name .team{color:var(--muted); font-weight:400; font-size:11.5px; font-family:'Inter'; display:inline-flex; align-items:center; gap:4px;}
+td.name .team-logo{width:16px; height:16px; object-fit:contain; flex:none;}
+.avatar{
+  width:30px; height:30px; border-radius:50%; flex:none; display:inline-flex;
+  align-items:center; justify-content:center; font-family:'Oswald'; font-size:11px; font-weight:600; color:#fff;
+}
+.name-text{display:flex; flex-direction:column; line-height:1.25;}
+.pos-badge{
+  display:inline-block; font-family:'Oswald'; font-size:10.5px; letter-spacing:.04em;
+  padding:2px 7px; border-radius:4px; background:var(--surface-2); color:var(--muted); border:1px solid var(--line);
+}
+.pos-C{background:var(--posC-soft); color:var(--posC); border-color:transparent;}
+.pos-LW{background:var(--posLW-soft); color:var(--posLW); border-color:transparent;}
+.pos-RW{background:var(--posRW-soft); color:var(--posRW); border-color:transparent;}
+.pos-D{background:var(--posD-soft); color:var(--posD); border-color:transparent;}
+.pos-G{background:var(--posG-soft); color:var(--posG); border-color:transparent;}
+.draft-now-btn{
+  flex:none; width:24px; height:24px; border-radius:50%; border:1px solid var(--good);
+  background:var(--good-soft); color:var(--good); font-family:'Inter'; font-weight:700; font-size:14px;
+  line-height:1; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; padding:0;
+}
+.draft-now-btn:hover{background:var(--good); color:#fff;}
+.draft-now-btn:disabled{opacity:.3; cursor:default; background:var(--surface-2); color:var(--muted); border-color:var(--line);}
+.proj-tag{font-size:9px; color:var(--faint); text-transform:uppercase; letter-spacing:.03em;}
+.mic-btn{
+  flex:none; width:38px; height:38px; border-radius:8px; border:1px solid var(--line);
+  background:var(--surface); color:var(--muted); font-size:15px; cursor:pointer; box-shadow:var(--shadow);
+}
+.mic-btn.listening{background:var(--danger); color:#fff; border-color:var(--danger); animation:mic-pulse 1.1s ease-in-out infinite;}
+@keyframes mic-pulse{0%,100%{box-shadow:0 0 0 0 rgba(194,46,58,.45);} 50%{box-shadow:0 0 0 6px rgba(194,46,58,0);}}
+.rank-cell{color:var(--faint); font-weight:600;}
+.tier{
+  display:inline-block; width:22px; height:22px; line-height:22px; text-align:center;
+  border-radius:5px; font-family:'Oswald'; font-size:11px; font-weight:600;
+}
+.tier-1{background:var(--tier1-soft); color:var(--tier1);}
+.tier-2{background:var(--tier2-soft); color:var(--tier2);}
+.tier-3{background:var(--tier3-soft); color:var(--tier3);}
+.tier-4{background:var(--tier4-soft); color:var(--tier4);}
+.tier-5{background:var(--tier5-soft); color:var(--tier5);}
+.vor-pos{color:var(--good);}
+.vor-neg{color:var(--danger);}
+.empty-note{padding:40px 20px; text-align:center; color:var(--muted);}
+
+footer.note{color:var(--faint); font-size:11.5px; text-align:center; padding-top:6px;}
+code{background:var(--surface-2); padding:1px 5px; border-radius:4px; font-family:'JetBrains Mono'; font-size:11.5px;}
+
+@media (max-width:640px){
+  .wrap{padding:18px 12px 40px;}
+  .brand h1{font-size:24px;}
+  table{min-width:760px;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand">
+      <div class="rink">Fantasy Hockey · Points League</div>
+      <h1>Ice Level</h1>
+      <div class="sub">Draft prospect board — ranks players by projected fantasy points and value over replacement.</div>
+    </div>
+    <div class="stat-chips" id="statChips"></div>
+  </div>
+
+  <details class="panel" open id="settingsPanel">
+    <summary>Scoring &amp; Roster Settings <span class="hint">points-per-stat and league size drive the rankings below</span></summary>
+    <div class="panel-body">
+      <div class="group-title">Skater scoring (pts per stat)</div>
+      <div class="field-grid" id="skaterWeights"></div>
+      <div class="group-title">Goalie scoring (pts per stat)</div>
+      <div class="field-grid" id="goalieWeights"></div>
+      <div class="group-title">League &amp; roster (sets "replacement level" for VOR)</div>
+      <div class="field-grid roster" id="rosterFields"></div>
+      <div style="margin-top:14px; display:flex; gap:10px;">
+        <button class="primary" id="applySettings">Apply &amp; Recalculate</button>
+        <button class="ghost" id="resetSettings">Reset to Defaults</button>
+      </div>
+    </div>
+  </details>
+
+  <details class="panel" id="outlookPanel">
+    <summary>2026-27 Outlook Notes <span class="hint">context for the loaded 2025-26 stats, not exhaustive</span></summary>
+    <div class="panel-body">
+      <ul class="outlook-list">
+<li>Mitch Marner (VGK): Signed-and-traded from Toronto to Vegas in an offseason deal (deal closed ~June 30, 2026); the 2025-26 stats in this CSV already reflect his full season with Vegas, so no team-abbreviation surprise here for 2026-27 either.</li>
+<li>Alex Ovechkin (WSH): Re-signed a 1-year, $4.25M deal to stay in Washington for 2026-27 rather than retiring after passing Gretzky's goal record. Workload/ice-time could dip further as he ages, so treat his ADP with some caution.</li>
+<li>Nikita Kucherov (TBL): Back-to-back Hart Trophy winner; extension talks with Tampa Bay are ongoing (GM Julien BriseBois says he expects Kucherov to stay long-term), but as of this writing it appears he has NOT yet signed a new long-term deal — worth double-checking contract status closer to your draft in case term/no-trade complications arise.</li>
+<li>Macklin Celebrini (SJS): Sophomore breakout is real and already baked into this dataset (82 GP, 115 points, good peripherals) — being talked about as a legitimate first-round fantasy pick now, not just a prospect stash.</li>
+<li>Matthew Schaefer (NYI): Won the Calder Trophy (rookie of the year) after his 59-point rookie season reflected in this file; expect a continued workload increase and possible power-play time bump in year two.</li>
+<li>Gavin McKenna (TOR, incoming rookie): 2026 first-overall draft pick, posted eye-catching numbers in his final pre-NHL season (reported 51 points in 35 NCAA/junior games). He is NOT in this CSV since he has no 2025-26 NHL stats, but he's likely to be one of the most-drafted rookies in 2026-27 fantasy leagues if he makes Toronto's opening roster — flag as unverified/speculative for games-played projections.</li>
+<li>Aleksander Barkov (FLA): Suffered a torn ACL/MCL early in the 2025-26 season (hence his very limited stats footprint if any this year) and is reportedly on track to be full-go for 2026-27 training camp. Verify health status close to your draft before assuming a full 82-game season.</li>
+<li>Seth Jarvis (CAR): Underwent shoulder surgery in the 2026 offseason and is expected to miss roughly 4-6 months, putting a realistic return in the late-October to December window for 2026-27 — expect a slow start and reduced games played versus his 71-GP, 66-point 2025-26 season in this file.</li>
+<li>Frederik Andersen (goalie): Listed on CAR in this CSV for his 2025-26 stats, but reporting indicates he is now with Edmonton for 2026-27 and expected to miss training camp with no announced return date — a real goaltending-timeshare risk in Edmonton if true; unverified exact new contract terms, so treat as developing.</li>
+<li>Thatcher Demko (VAN, goalie): Returning from January hip surgery; reported to be on track for training camp but Vancouver has not fully committed to him as the guaranteed starter — a goalie timeshare/committee situation is possible early in 2026-27.</li>
+<li>Elvis Merzlikins (CBJ, goalie): Had shoulder surgery after offseason discomfort; no firm Columbus return timeline as of the most recent reporting, which could open up more starts for Jet Greaves (already the higher-workload CBJ goalie in this dataset at 55 GP/26 W).</li>
+<li>Logan Stankoven (CAR) and Egor Chinakhov (CBJ/PIT): Both named in recent fantasy previews as breakout candidates for 2026-27 coming off modest-but-promising 2025-26 point totals (44 and 42 points respectively in this file) — worth a speculative mid-to-late round look.</li>
+<li>Darnell Nurse: Reported traded from Edmonton to San Jose (for Shakir Mukhamadullin and a depth piece) in the 2026 offseason — if this holds, his team abbreviation for 2026-27 drafts should be SJS, not EDM as listed for his 2025-26 season in this file.</li>
+<li>General caveat: several of the above (Kucherov's exact contract status, McKenna's opening-night roster spot, Andersen's new team/contract, Nurse's trade) are drawn from web reporting dated mid-to-late 2026 and should be re-verified close to your actual draft date, since offseason/training-camp situations can still change.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="panel" id="importPanel">
+    <summary>Import Players <span class="hint">paste or upload a CSV of stats</span></summary>
+    <div class="panel-body">
+      <div class="import-row">
+        <input type="file" id="csvFile" accept=".csv,text/csv">
+        <button id="loadSample">Load 2025-26 Final Stats</button>
+        <button id="downloadTemplate">Show CSV Template</button>
+        <span class="filehint">Columns auto-detect. Recognized: name, team, pos, gp, g, a, ppg, ppa, shg, sha, sog, hit, blk, pim, +/-, (goalies) w, so, sv, ga, plus optional draftpick &amp; rookie (1/0) for rookie projections.</span>
+      </div>
+      <textarea id="csvPaste" placeholder="Or paste CSV text here, e.g.&#10;name,team,pos,gp,g,a,ppg,ppa,shg,sha,sog,hit,blk,pim,+/-&#10;Connor McDavid,EDM,C,76,32,68,11,17,2,3,220,20,18,30,22"></textarea>
+      <div style="margin-top:10px; display:flex; gap:10px;">
+        <button class="primary" id="parseCsv">Parse &amp; Load</button>
+        <span class="filehint" id="parseStatus"></span>
+      </div>
+    </div>
+  </details>
+
+  <details class="panel" open id="draftPanel">
+    <summary>Draft Tracker <span class="hint">assign every pick to a team as your live draft happens</span></summary>
+    <div class="panel-body">
+      <div class="clock-banner" id="clockBanner"></div>
+      <div class="group-title">Teams</div>
+      <div class="team-name-grid" id="teamNameGrid"></div>
+      <div class="draft-controls">
+        <label class="field"><span>My Team</span><select id="myTeamSelect"></select></label>
+        <button class="primary" id="saveTeams">Save Teams</button>
+        <button class="ghost" id="undoPick">Undo Last Pick</button>
+        <button class="ghost" id="resetDraft">Reset Draft</button>
+      </div>
+      <div class="group-title">Team Rosters</div>
+      <div class="roster-grid" id="rosterGrid"></div>
+      <div class="group-title">Draft Board <span style="color:var(--faint); text-transform:none; letter-spacing:0; font-weight:400;">— filled squares are colored by the drafted player's position</span></div>
+      <div class="legend" style="margin-bottom:8px;">
+        <span class="sw"><span class="dot" style="background:var(--posC)"></span>C</span>
+        <span class="sw"><span class="dot" style="background:var(--posLW)"></span>LW</span>
+        <span class="sw"><span class="dot" style="background:var(--posRW)"></span>RW</span>
+        <span class="sw"><span class="dot" style="background:var(--posD)"></span>D</span>
+        <span class="sw"><span class="dot" style="background:var(--posG)"></span>G</span>
+      </div>
+      <div class="draft-board-wrap" id="draftBoardWrap"></div>
+    </div>
+  </details>
+
+  <div class="toolbar">
+    <div class="tabs" id="posTabs"></div>
+    <select class="team-filter" id="teamFilter"></select>
+    <input class="search" id="search" type="text" placeholder="Search player or team…">
+    <button class="mic-btn" id="micBtn" type="button" title="Voice search">🎤</button>
+    <div class="spacer"></div>
+    <div class="legend" title="Each player's tier is ranked against others at their own position, not the whole player pool">
+      <span class="sw"><span class="dot" style="background:var(--tier1)"></span>T1 Elite</span>
+      <span class="sw"><span class="dot" style="background:var(--tier2)"></span>T2 Strong</span>
+      <span class="sw"><span class="dot" style="background:var(--tier3)"></span>T3 Solid</span>
+      <span class="sw"><span class="dot" style="background:var(--tier4)"></span>T4 Depth</span>
+      <span class="sw"><span class="dot" style="background:var(--tier5)"></span>T5 Replacement</span>
+      <span style="color:var(--faint)">· ranked within position</span>
+    </div>
+  </div>
+
+  <div class="board">
+    <table id="board">
+      <thead><tr id="headRow"></tr></thead>
+      <tbody id="bodyRows"></tbody>
+    </table>
+  </div>
+
+  <footer class="note">Rankings are computed entirely in your browser. Your settings, imported players and draft picks are saved to this browser only (<code>localStorage</code>) — nothing is sent anywhere.</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var LS_SETTINGS = 'iceLevel.settings.v1';
+  var LS_PLAYERS = 'iceLevel.players.v1';
+  var LS_DRAFT = 'iceLevel.draft.v2';
+  var LS_TEAMS = 'iceLevel.teams.v1';
+
+  var DEFAULT_SETTINGS = {
+    weights: {
+      g:3, a:2, ppg:2, ppa:1, shg:3, sha:2, sog:0.4, hit:0.2, blk:0.2, pim:0.1, pm:0.5,
+      w:4, so:4, sv:0.2, ga:-1
+    },
+    roster: { teams:12, c:2, lw:2, rw:2, d:4, g:2, benchSkaters:4, benchGoalies:1 }
+  };
+
+  var WEIGHT_LABELS = {
+    g:'Goal', a:'Assist', ppg:'PP Goal', ppa:'PP Assist', shg:'SH Goal', sha:'SH Assist',
+    sog:'Shot on Goal', hit:'Hit', blk:'Block', pim:'PIM', pm:'+/-',
+    w:'Win', so:'Shutout', sv:'Save', ga:'Goal Against'
+  };
+  var SKATER_KEYS = ['g','a','ppg','ppa','shg','sha','sog','hit','blk','pim','pm'];
+  var GOALIE_KEYS = ['w','so','sv','ga'];
+  var ROSTER_LABELS = { teams:'Teams', c:'C slots', lw:'LW slots', rw:'RW slots', d:'D slots', g:'G slots', benchSkaters:'Skater bench', benchGoalies:'Goalie bench' };
+  var ROSTER_KEYS = ['teams','c','lw','rw','d','g','benchSkaters','benchGoalies'];
+
+  var COLUMN_ALIASES = {
+    name: ['name','player','player name','skater'],
+    team: ['team','tm'],
+    pos: ['pos','position'],
+    gp: ['gp','games','gamesplayed'],
+    g: ['g','goals'],
+    a: ['a','assists'],
+    ppg: ['ppg','powerplaygoals','ppgoals'],
+    ppa: ['ppa','powerplayassists','ppassists'],
+    shg: ['shg','shorthandedgoals','shgoals'],
+    sha: ['sha','shorthandedassists','shassists'],
+    sog: ['sog','shots','sh','shotsongoal'],
+    hit: ['hit','hits'],
+    blk: ['blk','blocks','blockedshots','bs'],
+    pim: ['pim','penaltyminutes'],
+    pm: ['+/-','plusminus','pm','plmi'],
+    w: ['w','wins'],
+    so: ['so','shutouts'],
+    sv: ['sv','saves'],
+    ga: ['ga','goalsagainst'],
+    gaa: ['gaa'],
+    svpct: ['sv%','savepct','svpct'],
+    draftpick: ['draftpick','pick','overallpick','draftedpick'],
+    rookie: ['rookie','isrookie','rook']
+  };
+
+  var TEAM_COLORS = {
+    ANA:'#B5985A', ARI:'#8C2633', BOS:'#FFB81C', BUF:'#003087', CAR:'#CC0000', CBJ:'#002654',
+    CGY:'#D2001C', CHI:'#CF0A2C', COL:'#6F263D', DAL:'#006847', DET:'#CE1126', EDM:'#FF4C00',
+    FLA:'#C8102E', LAK:'#111111', MIN:'#154734', MTL:'#AF1E2D', NJD:'#CE1126', NSH:'#FFB81C',
+    NYI:'#00539B', NYR:'#0038A8', OTT:'#C52032', PHI:'#F74902', PIT:'#FCB514', SEA:'#001628',
+    SJS:'#006D75', STL:'#002F87', TBL:'#002868', TOR:'#00205B', UTA:'#69B3E7', VAN:'#00205B',
+    VGK:'#B4975A', WPG:'#041E42', WSH:'#C8102E'
+  };
+  function teamColor(team){ return TEAM_COLORS[(team||'').toUpperCase()] || '#6B7785'; }
+
+  // ESPN's NHL logo CDN uses its own short team codes, which differ from our
+  // 3-letter team abbreviations for a handful of teams (e.g. LAK -> la, SJS -> sj).
+  // Best-effort mapping; a wrong/stale code just fails the <img> and the onerror
+  // handler below hides it, leaving the colored team chip as the fallback.
+  var ESPN_TEAM_CODE = {
+    ANA:'ana', ARI:'ari', BOS:'bos', BUF:'buf', CAR:'car', CBJ:'cbj', CGY:'cgy', CHI:'chi',
+    COL:'col', DAL:'dal', DET:'det', EDM:'edm', FLA:'fla', LAK:'la', MIN:'min', MTL:'mtl',
+    NJD:'nj', NSH:'nsh', NYI:'nyi', NYR:'nyr', OTT:'ott', PHI:'phi', PIT:'pit', SEA:'sea',
+    SJS:'sj', STL:'stl', TBL:'tb', TOR:'tor', UTA:'utah', VAN:'van', VGK:'vgk', WPG:'wpg', WSH:'wsh'
+  };
+  function teamLogoHtml(team){
+    var t = (team||'').toUpperCase();
+    var code = ESPN_TEAM_CODE[t];
+    if(!code) return '';
+    return '<img class="team-logo" src="https://a.espncdn.com/i/teamlogos/nhl/500/'+code+'.png" alt="" loading="lazy" onerror="this.remove()">';
+  }
+
+  // NHL playerId -> headshot mapping, loaded async from player-ids.json (see loadPlayerIds()).
+  // Keyed the same way as playerKey(): "name|team" lowercased. Empty until that file loads
+  // or for any player it doesn't cover, in which case avatarHtml() below is used instead.
+  var PLAYER_IDS = {};
+  function loadPlayerIds(){
+    fetch('player-ids.json').then(function(r){ return r.ok ? r.json() : {}; }).then(function(data){
+      PLAYER_IDS = data || {};
+      render();
+    }).catch(function(){ /* file missing or not served — headshots just fall back to avatars */ });
+  }
+
+  var POS_COLOR_VAR = { C:'--posC', LW:'--posLW', RW:'--posRW', D:'--posD', G:'--posG' };
+  function avatarHtml(name, posGroup){
+    var initials = (name||'?').split(/\s+/).filter(Boolean).map(function(w){return w[0];}).slice(0,2).join('').toUpperCase() || '?';
+    var varName = POS_COLOR_VAR[posGroup] || '--muted';
+    return '<span class="avatar" style="background:var('+varName+')">'+escapeHtml(initials)+'</span>';
+  }
+  function headshotHtml(key, name, posGroup){
+    var id = PLAYER_IDS[key];
+    if(!id) return avatarHtml(name, posGroup);
+    var fallback = avatarHtml(name, posGroup).replace(/"/g, '&quot;');
+    return '<img class="avatar" style="object-fit:cover;" src="https://assets.nhle.com/mugs/nhl/latest/'+id+'@2x.png" alt="" loading="lazy" '+
+      'onerror="this.outerHTML=\''+fallback+'\'">';
+  }
+  function teamChipHtml(team){
+    var t = (team||'').toUpperCase();
+    if(!t) return '';
+    return '<span class="team-chip" style="background:'+teamColor(t)+'">'+escapeHtml(t)+'</span>';
+  }
+
+  var SAMPLE_CSV =
+"name,team,pos,gp,g,a,ppg,ppa,shg,sha,sog,hit,blk,pim,+/-,w,so,sv,ga\n"+
+"Connor McDavid,EDM,C,82,48,90,13,41,1,1,306,40,30,44,17\n"+
+"Nikita Kucherov,TBL,RW,76,44,86,8,29,1,0,231,36,29,50,43\n"+
+"Nathan MacKinnon,COL,C,80,53,74,11,19,0,0,350,64,35,39,57\n"+
+"Macklin Celebrini,SJS,C,82,45,70,8,25,0,0,287,53,53,44,8\n"+
+"Mark Scheifele,WPG,C,82,36,67,7,15,0,1,175,32,47,43,0\n"+
+"Nick Suzuki,MTL,C,82,29,72,11,32,1,0,183,62,62,28,37\n"+
+"David Pastrnak,BOS,RW,77,29,71,10,23,0,0,261,86,32,72,4\n"+
+"Martin Necas,COL,C,78,38,62,9,15,0,0,206,85,26,30,47\n"+
+"Leon Draisaitl,EDM,C,65,35,62,16,26,1,0,186,34,15,26,13\n"+
+"Jason Robertson,DAL,LW,82,45,51,15,26,0,0,294,48,34,32,22\n"+
+"Evan Bouchard,EDM,D,82,21,74,7,26,0,2,221,29,101,30,25\n"+
+"Kyle Connor,WPG,LW,82,39,53,5,14,2,1,274,36,19,16,-2\n"+
+"Jack Eichel,VGK,C,74,27,63,1,27,1,2,260,35,40,18,23\n"+
+"Kirill Kaprizov,MIN,LW,78,45,44,19,13,0,0,269,52,27,28,10\n"+
+"Cole Caufield,MTL,RW,81,51,37,11,18,0,0,258,50,21,14,29\n"+
+"Clayton Keller,UTA,RW,82,26,62,3,24,0,0,225,8,32,38,21\n"+
+"Jake Guentzel,TBL,C,81,38,50,8,22,2,0,220,39,41,61,13\n"+
+"Wyatt Johnston,DAL,C,82,45,41,27,15,0,0,206,56,55,32,-5\n"+
+"Matt Boldy,MIN,LW,76,42,43,11,19,4,0,254,60,58,30,18\n"+
+"Alex DeBrincat,DET,RW,82,41,44,15,8,0,0,287,38,39,19,8\n"+
+"Artemi Panarin,LAK,LW,78,28,56,4,19,0,0,224,11,16,20,-7\n"+
+"Tim Stützle,OTT,C,80,34,49,9,20,2,0,194,126,44,39,7\n"+
+"Tage Thompson,BUF,C,81,40,41,6,18,0,1,272,85,48,35,-6\n"+
+"Zach Werenski,CBJ,D,75,22,59,4,17,0,1,260,30,94,18,7\n"+
+"Sebastian Aho,CAR,C,79,27,53,7,20,2,4,195,63,23,46,11\n"+
+"Mitch Marner,VGK,RW,81,24,56,5,19,0,1,165,24,46,24,17\n"+
+"Cale Makar,COL,D,75,20,59,4,25,0,0,199,35,118,24,32\n"+
+"William Nylander,TOR,RW,65,30,49,7,15,0,0,156,13,26,16,-14\n"+
+"Mika Zibanejad,NYR,C,81,34,44,16,19,2,0,215,105,50,14,-20\n"+
+"Lane Hutson,MTL,D,82,12,66,2,18,0,0,124,31,137,34,36\n"+
+"Mikko Rantanen,DAL,RW,64,22,55,6,28,0,0,139,48,30,93,0\n"+
+"Jack Hughes,NJD,C,61,27,50,4,19,1,1,228,4,32,10,0\n"+
+"Quinn Hughes,MIN,D,74,7,69,2,32,0,0,187,7,87,32,-4\n"+
+"Lucas Raymond,DET,LW,80,25,51,7,20,0,0,173,43,29,22,1\n"+
+"Connor Bedard,CHI,C,69,30,45,7,14,0,0,226,31,27,50,-18\n"+
+"Filip Forsberg,NSH,LW,82,40,35,11,15,0,0,246,124,33,34,-2\n"+
+"Brandon Hagel,TBL,LW,71,36,38,5,7,1,0,214,42,38,58,34\n"+
+"Rasmus Dahlin,BUF,D,77,19,55,6,16,0,0,194,67,79,76,18\n"+
+"Sidney Crosby,PIT,C,68,29,45,10,13,0,0,160,60,30,44,0\n"+
+"Ryan O'Reilly,NSH,C,81,25,49,5,15,2,1,154,17,66,22,8\n"+
+"Nick Schmaltz,UTA,C,82,33,41,11,9,2,0,206,23,52,28,17\n"+
+"Adrian Kempe,LAK,RW,81,36,37,4,8,0,2,226,127,39,58,14\n"+
+"Mark Stone,VGK,RW,60,28,45,9,18,1,1,130,31,47,9,26\n"+
+"Juraj Slafkovský,MTL,LW,82,30,43,15,13,0,0,180,105,78,52,9\n"+
+"Dylan Guenther,UTA,RW,79,40,33,9,15,0,0,242,66,28,28,7\n"+
+"Mathew Barzal,NYI,C,81,19,53,2,18,0,0,184,29,50,61,10\n"+
+"John Tavares,TOR,C,82,31,40,12,9,0,0,192,74,24,28,-28\n"+
+"Nikolaj Ehlers,CAR,LW,82,26,45,10,19,0,0,207,21,24,14,8\n"+
+"Drake Batherson,OTT,RW,79,33,38,13,17,0,0,167,122,22,33,-7\n"+
+"Jesper Bratt,NJD,LW,82,22,49,5,15,1,1,178,74,24,12,-11\n"+
+"Darren Raddysh,TBL,D,73,22,48,10,16,0,0,212,67,69,72,21\n"+
+"Andrei Svechnikov,CAR,RW,79,31,39,12,17,0,0,203,148,16,66,1\n"+
+"Cutter Gauthier,ANA,LW,76,41,28,11,8,0,0,285,64,20,28,-2\n"+
+"Gabriel Vilardi,WPG,C,82,30,39,13,11,0,0,150,20,35,24,-12\n"+
+"Travis Konecny,PHI,RW,77,27,41,2,12,1,1,168,108,38,59,14\n"+
+"Morgan Geekie,BOS,C,81,39,29,12,12,0,0,181,110,34,22,-5\n"+
+"Kirill Marchenko,CBJ,RW,76,27,40,6,17,1,0,218,61,40,32,7\n"+
+"Leo Carlsson,ANA,C,70,29,38,4,14,2,1,193,14,29,33,4\n"+
+"Trevor Zegras,PHI,C,81,26,41,10,13,0,0,167,46,28,62,0\n"+
+"Dylan Larkin,DET,C,74,34,33,14,10,1,0,229,46,33,48,3\n"+
+"Matthew Knies,TOR,LW,79,23,43,6,10,1,0,140,152,32,29,-30\n"+
+"Steven Stamkos,NSH,C,82,42,24,14,12,0,0,206,89,36,58,-17\n"+
+"Erik Karlsson,PIT,D,75,15,51,4,22,0,0,176,20,64,22,8\n"+
+"Nico Hischier,NJD,C,82,28,38,11,12,0,1,211,58,62,29,-6\n"+
+"Seth Jarvis,CAR,RW,71,32,34,5,16,4,2,224,81,27,23,6\n"+
+"Alex Tuch,BUF,RW,79,33,33,7,2,3,2,195,82,90,57,24\n"+
+"Bryan Rust,PIT,RW,72,29,36,8,16,1,1,183,35,71,26,0\n"+
+"Brock Nelson,COL,C,81,33,32,10,8,0,1,186,38,65,36,15\n"+
+"Pavel Zacha,BOS,C,78,30,35,11,11,0,0,131,64,26,28,4\n"+
+"Alex Ovechkin,WSH,LW,82,32,32,5,14,0,0,244,134,16,26,-5\n"+
+"Anthony Mantha,PIT,RW,81,33,31,7,6,0,0,152,52,40,43,10\n"+
+"Robert Thomas,STL,C,64,25,39,3,11,2,1,102,10,40,24,22\n"+
+"Pavel Dorofeyev,VGK,RW,82,37,27,20,10,0,0,230,27,28,24,-3\n"+
+"Miro Heiskanen,DAL,D,77,9,54,2,26,1,0,148,21,132,30,9\n"+
+"Tom Wilson,WSH,RW,72,30,32,7,5,1,0,153,179,53,117,15\n"+
+"Ivan Demidov,MTL,RW,82,19,43,7,13,0,0,127,28,26,34,3\n"+
+"Charlie McAvoy,BOS,D,69,11,50,2,21,0,0,111,79,129,62,13\n"+
+"Sam Reinhart,FLA,C,64,29,32,11,14,3,1,166,59,40,10,-18\n"+
+"Evgeni Malkin,PIT,C,56,19,42,4,18,0,0,148,24,17,61,13\n"+
+"Ivan Barbashev,VGK,LW,82,23,38,2,4,0,0,133,137,37,14,20\n"+
+"Jakob Chychrun,WSH,D,80,26,34,8,10,0,0,221,58,114,62,20\n"+
+"Beckett Sennecke,ANA,RW,82,23,37,1,12,1,0,197,97,24,62,-12\n"+
+"John Carlson,ANA,D,71,14,46,2,12,0,0,153,26,106,32,9\n"+
+"Moritz Seider,DET,D,82,10,50,3,25,0,0,187,128,180,57,15\n"+
+"Mikhail Sergachev,UTA,D,78,10,49,5,21,0,2,159,38,125,44,2\n"+
+"Dylan Cozens,OTT,C,82,28,31,13,16,0,0,205,215,24,59,-7\n"+
+"Will Smith,SJS,C,69,24,35,8,9,0,0,166,16,12,16,1\n"+
+"Matthew Schaefer,NYI,D,82,23,36,8,10,0,0,222,40,111,38,13\n"+
+"Adam Fantilli,CBJ,C,82,24,35,4,9,0,0,214,139,51,38,-13\n"+
+"Brady Tkachuk,OTT,LW,60,22,37,5,15,1,0,221,162,19,71,4\n"+
+"Dylan Strome,WSH,C,80,19,39,6,15,0,0,143,11,53,46,2\n"+
+"Charlie Coyle,CBJ,C,82,20,38,7,6,0,0,144,111,53,14,3\n"+
+"Jackson LaCombe,ANA,D,82,10,48,3,14,1,1,157,74,128,19,-2\n"+
+"Sam Bennett,FLA,C,76,26,32,5,9,0,0,201,115,32,82,-10\n"+
+"Tyler Bertuzzi,CHI,LW,79,32,26,11,10,0,0,164,55,24,42,-16\n"+
+"Tomas Hertl,VGK,C,82,24,34,13,12,0,0,202,114,45,39,-17\n"+
+"Troy Terry,ANA,RW,61,19,38,1,11,2,2,161,2,16,14,11\n"+
+"Patrick Kane,DET,RW,67,16,41,2,17,0,0,169,21,24,16,-1\n"+
+"Bo Horvat,NYI,C,68,31,26,7,9,1,0,226,51,38,40,8\n"+
+"Alexis Lafrenière,NYR,LW,82,24,33,9,6,0,0,164,84,42,20,-7\n"+
+"Luke Evangelista,NSH,RW,81,12,44,1,16,0,0,176,21,21,28,1\n"+
+"Ryan Nugent-Hopkins,EDM,C,72,20,36,11,18,0,1,133,25,31,21,-9\n"+
+"Carter Verhaeghe,FLA,C,77,25,30,6,5,0,0,187,68,22,32,-14\n"+
+"Roman Josi,NSH,D,68,13,42,4,20,0,0,181,24,101,30,-15\n"+
+"Josh Morrissey,WPG,D,77,14,41,2,14,0,0,146,36,118,30,6\n"+
+"Jordan Eberle,SEA,RW,80,26,29,4,12,0,0,168,55,43,28,2\n"+
+"Alexander Wennberg,SJS,C,80,18,37,8,7,0,1,93,28,93,18,-25\n"+
+"Ryan McLeod,BUF,C,81,14,40,0,7,5,1,90,16,34,16,25\n"+
+"Mats Zuccarello,MIN,RW,59,15,39,6,15,0,0,122,16,26,20,-5\n"+
+"Jake Sanderson,OTT,D,67,14,40,5,17,0,0,147,29,128,8,16\n"+
+"Brad Marchand,FLA,LW,52,27,27,6,14,0,0,138,36,16,38,-16\n"+
+"Viktor Arvidsson,BOS,LW,69,25,29,4,5,0,0,175,24,36,24,20\n"+
+"Vincent Trocheck,NYR,C,67,16,37,2,14,2,0,114,193,49,64,-16\n"+
+"Jackson Blake,CAR,RW,81,22,31,3,9,0,0,174,13,34,40,4\n"+
+"Adam Fox,NYR,D,55,9,44,5,19,0,1,91,24,74,20,5\n"+
+"William Eklund,SJS,LW,78,15,38,3,13,0,0,176,72,51,32,-31\n"+
+"J.T. Miller,NYR,C,68,17,36,6,13,0,1,144,123,34,33,-30\n"+
+"Auston Matthews,TOR,C,60,27,26,5,7,0,0,227,42,81,18,-4\n"+
+"Anthony Cirelli,TBL,C,71,23,29,3,1,2,2,125,50,47,48,38\n"+
+"Zach Hyman,EDM,LW,58,31,21,10,5,0,0,159,56,18,28,13\n"+
+"Josh Doan,BUF,RW,82,25,27,9,8,0,0,170,78,31,25,-4\n"+
+"Aliaksei Protas,WSH,LW,76,25,27,0,1,2,1,159,33,42,20,20\n"+
+"Dylan Holloway,STL,LW,59,22,29,4,4,0,0,162,129,41,20,13\n"+
+"Matvei Michkov,PHI,RW,81,20,31,4,8,0,0,163,33,19,71,0\n"+
+"Joel Eriksson Ek,MIN,C,70,19,32,7,9,0,0,194,106,34,32,16\n"+
+"Owen Tippett,PHI,RW,81,28,23,3,4,3,0,220,166,50,32,-6\n"+
+"Elias Pettersson,VAN,C,74,15,36,4,18,1,0,132,67,108,20,-30\n"+
+"Christian Dvorak,PHI,C,80,18,33,3,2,0,1,151,38,52,27,11\n"+
+"Jimmy Snuggerud,STL,RW,70,21,30,5,4,0,0,169,71,39,18,16\n"+
+"Brock Faber,MIN,D,80,15,36,1,10,1,1,173,33,148,39,18\n"+
+"Jack Quinn,BUF,RW,82,20,31,4,7,0,0,191,52,25,18,4\n"+
+"Brayden Point,TBL,C,63,18,32,6,5,0,0,129,8,23,14,12\n"+
+"Chris Kreider,ANA,LW,75,22,28,8,9,0,0,139,69,20,34,-4\n"+
+"Nazem Kadri,COL,C,77,16,34,5,14,0,0,213,50,30,30,-30\n"+
+"Matty Beniers,SEA,C,82,20,30,6,5,0,0,149,31,69,23,-8\n"+
+"Shayne Gostisbehere,CAR,D,55,13,37,6,12,0,0,116,29,63,22,11\n"+
+"Marcus Johansson,MIN,LW,75,15,34,3,6,0,1,106,34,20,12,18\n"+
+"Filip Hronek,VAN,D,82,8,41,4,17,0,2,137,133,100,33,-23\n"+
+"Chandler Stephenson,SEA,C,80,16,33,6,10,0,2,93,20,56,14,-24\n"+
+"Quinton Byfield,LAK,RW,79,24,25,4,7,0,1,180,66,44,46,-2\n"+
+"Claude Giroux,OTT,RW,82,14,35,1,12,0,0,138,65,27,22,20\n"+
+"Valeri Nichushkin,COL,RW,72,17,32,1,3,1,0,160,55,27,26,9\n"+
+"Tyler Toffoli,SJS,C,79,19,30,6,9,0,0,172,48,31,10,-12\n"+
+"Brock Boeser,VAN,RW,75,22,26,6,13,1,0,166,54,26,8,-48\n"+
+"Rickard Rakell,PIT,RW,60,24,24,7,9,1,1,166,71,43,8,-2\n"+
+"Artturi Lehkonen,COL,LW,70,21,27,1,1,0,0,153,45,33,16,32\n"+
+"Elias Lindholm,BOS,C,69,17,31,7,13,0,0,114,41,59,38,-7\n"+
+"Taylor Hall,CAR,LW,80,18,30,3,4,0,0,137,53,30,44,6\n"+
+"Pavel Buchnevich,STL,LW,81,20,28,4,11,0,0,142,30,40,26,-10\n"+
+"Vladimir Tarasenko,MIN,RW,75,23,24,5,8,0,0,148,60,33,10,-11\n"+
+"Noah Dobson,MTL,D,80,12,35,2,5,0,1,158,62,188,34,5\n"+
+"Noah Cates,PHI,LW,82,18,29,3,6,1,0,132,102,51,44,26\n"+
+"John-Jason Peterka,UTA,RW,82,25,22,3,2,0,0,159,16,19,28,6\n"+
+"Rasmus Andersson,VGK,D,81,17,30,6,7,1,0,178,37,150,71,4\n"+
+"Collin Graf,SJS,RW,81,21,25,0,1,2,1,118,88,48,12,6\n"+
+"Connor McMichael,WSH,LW,78,14,32,2,3,0,1,142,45,45,30,8\n"+
+"Bobby McMann,SEA,C,78,29,17,4,2,0,0,183,165,27,42,-3\n"+
+"Jordan Kyrou,STL,RW,72,18,28,4,10,0,0,173,14,28,8,-5\n"+
+"Shane Pinto,OTT,C,72,23,23,5,0,2,2,157,94,50,42,6\n"+
+"Jason Zucker,BUF,LW,62,24,21,10,6,0,0,128,57,21,23,-5\n"+
+"Matt Coronato,CGY,RW,80,18,27,7,8,0,0,197,23,23,32,-29\n"+
+"Ryan Leonard,WSH,RW,75,20,25,4,10,0,0,153,124,25,47,2\n"+
+"Matt Duchene,DAL,C,57,16,29,5,9,0,0,89,29,23,8,-3\n"+
+"Mason Marchment,CBJ,LW,68,19,26,3,4,0,0,119,84,28,56,17\n"+
+"Timo Meier,NJD,RW,77,24,20,6,4,0,0,269,131,53,22,-16\n"+
+"Vince Dunn,SEA,D,81,11,33,2,19,0,0,179,27,86,54,-24\n"+
+"Alex Laferriere,LAK,RW,82,21,23,3,2,2,0,209,255,49,18,3\n"+
+"Logan Stankoven,CAR,C,81,21,23,4,5,0,0,166,50,22,25,12\n"+
+"Anton Lundell,FLA,C,64,18,26,4,11,2,2,138,75,35,34,-8\n"+
+"Roope Hintz,DAL,C,53,15,29,6,13,0,0,126,60,18,18,16\n"+
+"Lawson Crouse,UTA,LW,81,24,20,1,0,1,1,141,212,52,46,20\n"+
+"Zach Benson,BUF,LW,65,13,30,1,4,1,1,116,40,22,42,27\n"+
+"Andrew Copp,DET,C,79,9,34,1,7,0,0,115,44,64,24,3\n"+
+"Mikael Backlund,CGY,C,82,17,26,1,2,1,4,186,23,28,16,7\n"+
+"Ryan Hartman,MIN,RW,76,23,20,6,1,0,0,167,64,95,48,-1\n"+
+"Logan Cooley,UTA,C,54,24,19,6,4,2,0,102,54,27,28,3\n"+
+"Connor Brown,NJD,RW,75,18,25,4,4,2,0,116,25,37,22,-1\n"+
+"Morgan Frost,CGY,C,82,22,21,8,8,0,0,140,59,39,28,-16\n"+
+"Thomas Novak,PIT,C,82,16,26,5,2,0,0,130,12,34,24,1\n"+
+"Egor Chinakhov,PIT,RW,72,21,21,2,4,0,0,140,49,31,10,-2\n"+
+"Casey Mittelstadt,BOS,C,71,15,27,2,5,0,0,80,23,21,12,12\n"+
+"Dawson Mercer,NJD,C,82,20,22,4,3,3,0,158,33,47,33,-2\n"+
+"Jake DeBrusk,VAN,LW,81,23,19,19,5,0,0,219,66,34,12,-31\n"+
+"Bowen Byram,BUF,D,82,11,31,1,6,0,1,109,50,93,48,15\n"+
+"Anders Lee,NYI,LW,82,19,23,5,3,0,0,199,91,37,44,0\n"+
+"Mason McTavish,ANA,C,75,17,24,6,5,0,0,146,95,33,42,-15\n"+
+"Simon Holmstrom,NYI,RW,79,19,22,1,3,2,2,100,16,45,16,4\n"+
+"Frank Nazar,CHI,C,66,15,26,4,8,1,0,138,37,43,26,-21\n"+
+"Mattias Samuelsson,BUF,D,78,13,28,0,0,1,2,109,132,154,28,41\n"+
+"Mavrik Bourque,DAL,C,82,20,21,1,4,0,0,147,78,21,22,6\n"+
+"Mattias Ekholm,EDM,D,82,6,35,0,3,0,0,131,65,125,30,32\n"+
+"Mikael Granlund,ANA,C,58,19,22,8,4,0,0,117,32,41,18,-9\n"+
+"Kevin Fiala,LAK,LW,56,18,22,4,13,0,0,147,39,24,34,-11\n"+
+"Jared McCann,SEA,LW,52,20,20,7,6,0,0,117,40,25,11,-7\n"+
+"Justin Faulk,DET,D,78,16,24,2,7,0,1,148,70,132,42,-8\n"+
+"Brandt Clarke,LAK,D,82,8,32,2,11,0,0,159,30,185,63,11\n"+
+"Kaapo Kakko,SEA,RW,65,13,27,2,6,0,0,78,30,12,14,14\n"+
+"Sam Malinski,COL,D,82,8,32,0,1,0,0,164,46,95,22,43\n"+
+"Matias Maccelli,TOR,LW,71,14,25,2,6,0,0,90,24,17,16,-23\n"+
+"Brayden Schenn,NYI,C,80,18,21,4,5,0,0,119,180,41,68,-28\n"+
+"Andrei Vasilevskiy,TBL,G,58,,,,,,,,,,,,39,2,1353,132\n"+
+"Karel Vejmelka,UTA,G,64,,,,,,,,,,,,38,2,1458,169\n"+
+"Jake Oettinger,DAL,G,54,,,,,,,,,,,,35,4,1234,138\n"+
+"Brandon Bussi,CAR,G,39,,,,,,,,,,,,31,2,816,97\n"+
+"Jeremy Swayman,BOS,G,55,,,,,,,,,,,,31,2,1426,146\n"+
+"Scott Wedgewood,COL,G,45,,,,,,,,,,,,31,4,1007,86\n"+
+"Logan Thompson,WSH,G,58,,,,,,,,,,,,31,4,1447,140\n"+
+"Lukas Dostal,ANA,G,56,,,,,,,,,,,,30,0,1344,169\n"+
+"John Gibson,DET,G,57,,,,,,,,,,,,29,4,1317,144\n"+
+"Dan Vladar,PHI,G,52,,,,,,,,,,,,29,0,1162,121\n"+
+"Ilya Sorokin,NYI,G,55,,,,,,,,,,,,29,7,1386,144\n"+
+"Jakub Dobes,MTL,G,43,,,,,,,,,,,,29,0,1070,117\n"+
+"Linus Ullmark,OTT,G,49,,,,,,,,,,,,28,3,1067,131\n"+
+"Juuse Saros,NSH,G,59,,,,,,,,,,,,28,0,1519,181\n"+
+"Filip Gustavsson,MIN,G,50,,,,,,,,,,,,28,4,1245,133\n"+
+"Sergei Bobrovsky,FLA,G,52,,,,,,,,,,,,27,4,1096,154\n"+
+"Jet Greaves,CBJ,G,55,,,,,,,,,,,,26,2,1397,142\n"+
+"Igor Shesterkin,NYR,G,51,,,,,,,,,,,,25,1,1299,126\n"+
+"Joel Hofer,STL,G,46,,,,,,,,,,,,24,6,1137,114\n"+
+"Stuart Skinner,PIT,G,50,,,,,,,,,,,,23,2,1125,142\n"+
+"Jacob Markstrom,NJD,G,44,,,,,,,,,,,,23,1,983,130\n"+
+"Connor Hellebuyck,WPG,G,57,,,,,,,,,,,,23,0,1385,162\n"+
+"Mackenzie Blackwood,COL,G,39,,,,,,,,,,,,23,3,843,90\n"+
+"Dustin Wolf,CGY,G,57,,,,,,,,,,,,23,2,1401,158\n"+
+"Ukko-Pekka Luukkonen,BUF,G,35,,,,,,,,,,,,22,1,846,85\n"+
+"Yaroslav Askarov,SJS,G,47,,,,,,,,,,,,21,0,1185,157\n"+
+"Joey Daccord,SEA,G,47,,,,,,,,,,,,20,2,1173,136\n"+
+"Alex Lyon,BUF,G,36,,,,,,,,,,,,20,3,888,92\n"+
+"Darcy Kuemper,LAK,G,50,,,,,,,,,,,,19,3,1100,134\n"+
+"Arturs Silovs,PIT,G,39,,,,,,,,,,,,19,2,906,115\n"+
+"Spencer Knight,CHI,G,55,,,,,,,,,,,,19,3,1428,155\n"+
+"Tristan Jarry,EDM,G,33,,,,,,,,,,,,18,2,734,98\n"+
+"Jesper Wallstedt,MIN,G,35,,,,,,,,,,,,18,4,934,87\n"+
+"Alex Nedeljkovic,SJS,G,40,,,,,,,,,,,,18,0,940,109\n"+
+"Jake Allen,NJD,G,37,,,,,,,,,,,,17,1,932,100\n"+
+"Anton Forsberg,LAK,G,36,,,,,,,,,,,,16,3,866,87\n"+
+"Connor Ingram,EDM,G,32,,,,,,,,,,,,16,2,686,77\n"+
+"Akira Schmid,VGK,G,34,,,,,,,,,,,,16,2,706,85\n"+
+"Frederik Andersen,CAR,G,35,,,,,,,,,,,,16,0,742,107\n"+
+"Casey DeSmith,DAL,G,30,,,,,,,,,,,,15,1,689,71\n";
+
+  var state = {
+    settings: JSON.parse(JSON.stringify(DEFAULT_SETTINGS)),
+    players: [],
+    draft: {},
+    teamNames: [],
+    myTeam: 0,
+    pickCounter: 0,
+    posFilter: 'ALL',
+    teamFilter: 'ALL',
+    search: '',
+    sortKey: 'vor',
+    sortDir: -1
+  };
+
+  function load(){
+    try{
+      var s = localStorage.getItem(LS_SETTINGS);
+      if(s){
+        var saved = JSON.parse(s);
+        state.settings.weights = Object.assign({}, DEFAULT_SETTINGS.weights, saved.weights);
+        state.settings.roster = Object.assign({}, DEFAULT_SETTINGS.roster, saved.roster);
+      }
+    }catch(e){}
+    try{ var p = localStorage.getItem(LS_PLAYERS); if(p) state.players = JSON.parse(p); }catch(e){}
+    try{ var d = localStorage.getItem(LS_DRAFT); if(d) state.draft = JSON.parse(d); }catch(e){}
+    try{
+      var t = localStorage.getItem(LS_TEAMS);
+      if(t){
+        var savedTeams = JSON.parse(t);
+        state.teamNames = savedTeams.names || [];
+        state.myTeam = savedTeams.myTeam || 0;
+        state.pickCounter = savedTeams.pickCounter || 0;
+      }
+    }catch(e){}
+  }
+  function saveSettings(){ try{ localStorage.setItem(LS_SETTINGS, JSON.stringify(state.settings)); }catch(e){} }
+  function savePlayers(){ try{ localStorage.setItem(LS_PLAYERS, JSON.stringify(state.players)); }catch(e){} }
+  function saveDraft(){ try{ localStorage.setItem(LS_DRAFT, JSON.stringify(state.draft)); }catch(e){} }
+  function saveTeams(){
+    try{ localStorage.setItem(LS_TEAMS, JSON.stringify({names:state.teamNames, myTeam:state.myTeam, pickCounter:state.pickCounter})); }catch(e){}
+  }
+
+  function ensureTeamNames(){
+    var n = state.settings.roster.teams || 12;
+    var names = state.teamNames || [];
+    var out = [];
+    for(var i=0;i<n;i++){ out.push(names[i] || ('Team '+(i+1))); }
+    state.teamNames = out;
+    if(state.myTeam==null || state.myTeam>=n || state.myTeam<0) state.myTeam = 0;
+  }
+
+  function picksMadeCount(){
+    return Object.keys(state.draft).filter(function(k){ return state.draft[k] && state.draft[k].team!=null; }).length;
+  }
+
+  function onClock(){
+    var teams = state.teamNames.length || 1;
+    var pickNum = picksMadeCount()+1;
+    var round = Math.ceil(pickNum/teams);
+    var posInRound = (pickNum-1) % teams;
+    var idx = (round % 2 === 1) ? posInRound : (teams-1-posInRound);
+    return { pickNum:pickNum, round:round, idx:idx };
+  }
+
+  function assignPlayer(key, teamValue){
+    if(teamValue===''||teamValue===null||teamValue===undefined){
+      delete state.draft[key];
+    } else {
+      var idx = parseInt(teamValue,10);
+      var existing = state.draft[key];
+      if(existing && existing.team!=null){
+        existing.team = idx;
+      } else {
+        state.pickCounter++;
+        state.draft[key] = { team:idx, pick:state.pickCounter };
+      }
+    }
+    saveDraft();
+    saveTeams();
+    render();
+  }
+
+  function undoLastPick(){
+    var lastKey=null, lastPick=-1;
+    Object.keys(state.draft).forEach(function(k){
+      var d = state.draft[k];
+      if(d && d.team!=null && d.pick>lastPick){ lastPick=d.pick; lastKey=k; }
+    });
+    if(lastKey){ delete state.draft[lastKey]; saveDraft(); render(); }
+  }
+
+  function resetDraft(){
+    if(!confirm('Reset the entire draft? This clears every team assignment (settings and imported players are kept).')) return;
+    state.draft = {};
+    state.pickCounter = 0;
+    saveDraft();
+    saveTeams();
+    render();
+  }
+
+  function playerKey(p){ return (p.name+'|'+p.team).toLowerCase(); }
+
+  // ---------- CSV parsing ----------
+  function parseCsvText(text){
+    var lines = text.split(/\r\n|\n|\r/).filter(function(l){ return l.trim().length>0; });
+    if(lines.length < 2) return { rows:[], error:'No data rows found.' };
+    var headers = splitCsvLine(lines[0]).map(function(h){ return h.trim().toLowerCase().replace(/\s+/g,''); });
+    var colMap = {};
+    Object.keys(COLUMN_ALIASES).forEach(function(key){
+      var aliases = COLUMN_ALIASES[key].map(function(a){ return a.replace(/\s+/g,''); });
+      for(var i=0;i<headers.length;i++){
+        if(aliases.indexOf(headers[i]) !== -1){ colMap[key]=i; break; }
+      }
+    });
+    if(colMap.name === undefined) return { rows:[], error:'Could not find a "name" column.' };
+    var rows = [];
+    for(var r=1;r<lines.length;r++){
+      var cells = splitCsvLine(lines[r]);
+      if(cells.length===1 && cells[0].trim()==='') continue;
+      var row = { name:'', team:'', pos:'' };
+      Object.keys(colMap).forEach(function(key){
+        var raw = (cells[colMap[key]] || '').trim();
+        if(key==='name' || key==='team' || key==='pos'){ row[key]=raw; }
+        else{ row[key] = raw==='' ? 0 : parseFloat(raw.replace(/[^0-9.\-]/g,'')) || 0; }
+      });
+      if(!row.name) continue;
+      row.pos = (row.pos||'').toUpperCase().replace('LD','D').replace('RD','D');
+      row.team = (row.team||'').toUpperCase();
+      rows.push(row);
+    }
+    return { rows:rows, error:null };
+  }
+  function splitCsvLine(line){
+    var out=[], cur='', inQ=false;
+    for(var i=0;i<line.length;i++){
+      var c=line[i];
+      if(c==='"'){ inQ=!inQ; continue; }
+      if(c===',' && !inQ){ out.push(cur); cur=''; continue; }
+      cur+=c;
+    }
+    out.push(cur);
+    return out;
+  }
+
+  function isGoalie(p){ return (p.pos||'').indexOf('G')===0 || p.pos==='G'; }
+
+  // ---------- Scoring ----------
+  function computeFpts(p){
+    var w = state.settings.weights;
+    if(isGoalie(p)){
+      return (p.w||0)*w.w + (p.so||0)*w.so + (p.sv||0)*w.sv + (p.ga||0)*w.ga;
+    }
+    return (p.g||0)*w.g + (p.a||0)*w.a + (p.ppg||0)*w.ppg + (p.ppa||0)*w.ppa +
+           (p.shg||0)*w.shg + (p.sha||0)*w.sha + (p.sog||0)*w.sog +
+           (p.hit||0)*w.hit + (p.blk||0)*w.blk + (p.pim||0)*w.pim + (p.pm||0)*w.pm;
+  }
+
+  function primaryPos(p){
+    var pos = (p.pos||'').toUpperCase();
+    if(pos.indexOf('C')!==-1) return 'C';
+    if(pos.indexOf('LW')!==-1) return 'LW';
+    if(pos.indexOf('RW')!==-1) return 'RW';
+    if(pos.indexOf('W')!==-1 && pos.indexOf('LW')===-1 && pos.indexOf('RW')===-1) return 'LW';
+    if(pos.indexOf('D')!==-1) return 'D';
+    if(pos.indexOf('G')!==-1) return 'G';
+    return 'C';
+  }
+
+  function replacementRankFor(pos){
+    var r = state.settings.roster;
+    var teams = r.teams||12;
+    if(pos==='G') return Math.max(1, teams*(r.g||2) + (r.benchGoalies||0));
+    var perTeam = r[pos.toLowerCase()] || 1;
+    var benchShare = Math.round((r.benchSkaters||0) * ( (perTeam) / ((r.c||0)+(r.lw||0)+(r.rw||0)+(r.d||0) || 1) ));
+    return Math.max(1, teams*perTeam + benchShare);
+  }
+
+  // ---------- Projections ----------
+  var PROJ_SKATER_KEYS = ['ppg','ppa','shg','sha','sog','hit','blk','pim','pm'];
+  function buildPositionAverages(withPts){
+    var groups = {};
+    withPts.forEach(function(c, i){
+      var raw = state.players[i];
+      if(!raw) return;
+      var pg = c.posGroup, gp = raw.gp||0;
+      if(!groups[pg]) groups[pg] = {
+        count:0, goalSum:0, totalSum:0, per82:{ppg:0,ppa:0,shg:0,sha:0,sog:0,hit:0,blk:0,pim:0,pm:0},
+        goalieCount:0, goalieSum:{w:0,so:0,sv:0,ga:0}
+      };
+      var e = groups[pg];
+      if(pg==='G'){
+        if(gp>=20){
+          e.goalieCount++;
+          e.goalieSum.w += (raw.w||0)/gp*65;
+          e.goalieSum.so += (raw.so||0)/gp*65;
+          e.goalieSum.sv += (raw.sv||0)/gp*65;
+          e.goalieSum.ga += (raw.ga||0)/gp*65;
+        }
+      } else if(gp>=20){
+        e.count++;
+        e.goalSum += (raw.g||0);
+        e.totalSum += (raw.g||0)+(raw.a||0);
+        PROJ_SKATER_KEYS.forEach(function(k){ e.per82[k] += (raw[k]||0)/gp*82; });
+      }
+    });
+    var out = {};
+    Object.keys(groups).forEach(function(pg){
+      var e = groups[pg];
+      if(pg==='G'){
+        var ng = e.goalieCount||1;
+        out[pg] = { w:e.goalieSum.w/ng, so:e.goalieSum.so/ng, sv:e.goalieSum.sv/ng, ga:e.goalieSum.ga/ng };
+      } else {
+        var n = e.count||1;
+        var rates = {};
+        PROJ_SKATER_KEYS.forEach(function(k){ rates[k] = e.per82[k]/n; });
+        out[pg] = { goalRatio: e.totalSum>0 ? e.goalSum/e.totalSum : 0.42, per82:rates };
+      }
+    });
+    return out;
+  }
+
+  function computeProjection(raw, posGroup, posAvg){
+    if(posGroup==='G'){
+      var avgG = posAvg.G || {w:20,so:2,sv:1400,ga:150};
+      var gp = raw.gp||0;
+      if(gp < 20){
+        return { gp:30, pos:'G', method:'League-Avg Estimate (Limited NHL Sample)',
+          w:Math.round(avgG.w*30/65), so:Math.round(avgG.so*30/65), sv:Math.round(avgG.sv*30/65), ga:Math.round(avgG.ga*30/65) };
+      }
+      var projGp = Math.min(65, Math.max(gp, Math.round(gp*1.05)));
+      var scale = projGp/gp;
+      return { gp:projGp, pos:'G', method:'Extrapolated (Season Pace)',
+        w:Math.round((raw.w||0)*scale), so:Math.round((raw.so||0)*scale), sv:Math.round((raw.sv||0)*scale), ga:Math.round((raw.ga||0)*scale) };
+    }
+    var isRookie = (raw.rookie==1) || (raw.gp||0) < 15;
+    if(isRookie && raw.draftpick && raw.draftpick>0){
+      var pick = raw.draftpick;
+      var base82 = Math.max(12, Math.min(95, 115 - pick*2.1));
+      if(posGroup==='D') base82 *= 0.6;
+      var projGp = 74;
+      var totalPts = base82 * projGp/82;
+      var avg = posAvg[posGroup] || { goalRatio:0.42, per82:{} };
+      var projG = Math.round(totalPts*avg.goalRatio);
+      var projA = Math.max(0, Math.round(totalPts - projG));
+      var out = { gp:projGp, g:projG, a:projA, pos:posGroup, method:'Rookie Comp (Pick #'+pick+')' };
+      PROJ_SKATER_KEYS.forEach(function(k){ out[k] = Math.round((avg.per82[k]||0) * projGp/82); });
+      return out;
+    }
+    if((raw.gp||0) > 0){
+      var gp2 = raw.gp;
+      var projGp2 = Math.min(82, Math.max(gp2, 78));
+      var scale2 = projGp2/gp2;
+      var out2 = { gp:projGp2, pos:posGroup, method:'Extrapolated (82-GP Pace)' };
+      ['g','a'].concat(PROJ_SKATER_KEYS).forEach(function(k){ out2[k] = Math.round((raw[k]||0)*scale2); });
+      return out2;
+    }
+    return { gp:0, pos:posGroup, method:'No Data' };
+  }
+
+  function recompute(){
+    var withPts = state.players.map(function(p){
+      var c = Object.assign({}, p);
+      c.fpts = computeFpts(c);
+      c.fpPerGp = c.gp ? c.fpts/c.gp : 0;
+      c.posGroup = isGoalie(c) ? 'G' : primaryPos(c);
+      return c;
+    });
+
+    var posAvg = buildPositionAverages(withPts);
+    withPts.forEach(function(c, i){
+      var raw = state.players[i];
+      var proj = computeProjection(raw, c.posGroup, posAvg);
+      c.proj = proj;
+      c.projFpts = computeFpts(proj);
+    });
+
+    var byPos = {};
+    withPts.forEach(function(p){ (byPos[p.posGroup] = byPos[p.posGroup]||[]).push(p); });
+    Object.keys(byPos).forEach(function(pos){
+      var list = byPos[pos].slice().sort(function(a,b){ return b.fpts-a.fpts; });
+      var rank = replacementRankFor(pos);
+      var replFpts = list.length ? (list[Math.min(rank,list.length)-1] || list[list.length-1]).fpts : 0;
+      list.forEach(function(p, idx){
+        p.posRank = idx+1;
+        p.vor = p.fpts - replFpts;
+      });
+      var n = list.length;
+      list.forEach(function(p){
+        var pct = n>1 ? (p.posRank-1)/(n-1) : 0;
+        if(pct<=0.15) p.tier=1;
+        else if(pct<=0.35) p.tier=2;
+        else if(pct<=0.65) p.tier=3;
+        else if(pct<=0.85) p.tier=4;
+        else p.tier=5;
+      });
+    });
+
+    state.computed = withPts;
+    render();
+  }
+
+  // ---------- Rendering ----------
+  var STAT_COLUMNS = [
+    {key:'g', label:'G'}, {key:'a', label:'A'}, {key:'ppg', label:'PPG'}, {key:'ppa', label:'PPA'},
+    {key:'shg', label:'SHG'}, {key:'sha', label:'SHA'}, {key:'sog', label:'SOG'}, {key:'hit', label:'HIT'},
+    {key:'blk', label:'BLK'}, {key:'pim', label:'PIM'}, {key:'pm', label:'+/-'},
+    {key:'w', label:'W'}, {key:'so', label:'SO'}, {key:'sv', label:'SV'}, {key:'ga', label:'GA'}
+  ];
+  var GOALIE_ONLY_KEYS = {w:1, so:1, sv:1, ga:1};
+
+  var COLUMNS = [
+    {key:'rank', label:'#', num:true, sortable:false},
+    {key:'name', label:'Player', num:false},
+    {key:'posGroup', label:'Pos', num:false},
+    {key:'gp', label:'GP', num:true}
+  ].concat(STAT_COLUMNS.map(function(c){ return {key:c.key, label:c.label, num:true}; })).concat([
+    {key:'fpts', label:'FPTS', num:true},
+    {key:'fpPerGp', label:'FP/GP', num:true},
+    {key:'projFpts', label:'Proj FPTS', num:true},
+    {key:'vor', label:'VOR', num:true},
+    {key:'tier', label:'Tier', num:false},
+    {key:'draft', label:'Drafted By', num:false, sortable:false}
+  ]);
+
+  function buildHead(){
+    var tr = document.getElementById('headRow');
+    tr.innerHTML='';
+    COLUMNS.forEach(function(c){
+      var th = document.createElement('th');
+      th.textContent = c.label;
+      if(c.num) th.className='num';
+      if(c.sortable!==false){
+        th.addEventListener('click', function(){
+          if(state.sortKey===c.key) state.sortDir *= -1;
+          else { state.sortKey=c.key; state.sortDir = -1; }
+          render();
+        });
+        if(state.sortKey===c.key) th.className += ' sorted';
+      }
+      tr.appendChild(th);
+    });
+  }
+
+  function fmt(n, d){ d = d===undefined?1:d; return (Math.round(n*Math.pow(10,d))/Math.pow(10,d)).toFixed(d); }
+
+  function render(){
+    ensureTeamNames();
+
+    var chips = document.getElementById('statChips');
+    var total = (state.computed||[]).length;
+    var mine = Object.keys(state.draft).filter(function(k){ return state.draft[k] && state.draft[k].team===state.myTeam; }).length;
+    var drafted = picksMadeCount();
+    chips.innerHTML =
+      '<div class="chip"><div class="n mono">'+total+'</div><div class="l">Players</div></div>'+
+      '<div class="chip"><div class="n mono">'+mine+'</div><div class="l">On my team</div></div>'+
+      '<div class="chip"><div class="n mono">'+drafted+'</div><div class="l">Drafted</div></div>';
+
+    buildHead();
+    renderClock();
+
+    var tabsEl = document.getElementById('posTabs');
+    var positions = ['ALL','C','LW','RW','D','G'];
+    tabsEl.innerHTML = positions.map(function(p){
+      return '<button class="tab'+(state.posFilter===p?' active':'')+'" data-pos="'+p+'">'+p+'</button>';
+    }).join('');
+    Array.prototype.forEach.call(tabsEl.querySelectorAll('.tab'), function(btn){
+      btn.addEventListener('click', function(){ state.posFilter = btn.getAttribute('data-pos'); render(); });
+    });
+
+    var teamFilterEl = document.getElementById('teamFilter');
+    var tfOptions = ['<option value="ALL">All Players</option>','<option value="AVAIL">Available Only</option>'];
+    state.teamNames.forEach(function(name, idx){
+      tfOptions.push('<option value="'+idx+'">'+escapeHtml(name)+(idx===state.myTeam?' (Me)':'')+'</option>');
+    });
+    teamFilterEl.innerHTML = tfOptions.join('');
+    teamFilterEl.value = state.teamFilter;
+    teamFilterEl.onchange = function(){ state.teamFilter = teamFilterEl.value; render(); };
+
+    var rows = (state.computed||[]).slice();
+    if(state.posFilter!=='ALL') rows = rows.filter(function(p){ return p.posGroup===state.posFilter; });
+    if(state.teamFilter==='AVAIL'){
+      rows = rows.filter(function(p){ return !state.draft[playerKey(p)]; });
+    } else if(state.teamFilter!=='ALL'){
+      var wantIdx = parseInt(state.teamFilter,10);
+      rows = rows.filter(function(p){ var d=state.draft[playerKey(p)]; return d && d.team===wantIdx; });
+    }
+    if(state.search){
+      var q = state.search.toLowerCase();
+      rows = rows.filter(function(p){ return p.name.toLowerCase().indexOf(q)!==-1 || (p.team||'').toLowerCase().indexOf(q)!==-1; });
+    }
+    rows.sort(function(a,b){
+      var k = state.sortKey;
+      var av = k==='name' ? a.name.toLowerCase() : (k==='posGroup' ? a.posGroup : (k==='tier' ? -a.tier : a[k]));
+      var bv = k==='name' ? b.name.toLowerCase() : (k==='posGroup' ? b.posGroup : (k==='tier' ? -b.tier : b[k]));
+      if(av<bv) return -1*state.sortDir;
+      if(av>bv) return 1*state.sortDir;
+      return b.fpts - a.fpts;
+    });
+
+    var tbody = document.getElementById('bodyRows');
+    if(rows.length===0){
+      tbody.innerHTML = '<tr><td colspan="'+COLUMNS.length+'"><div class="empty-note">No players match. Import a CSV above or load the 2025-26 final stats.</div></td></tr>';
+    } else {
+      var clock = onClock();
+      tbody.innerHTML = rows.map(function(p, i){
+        var key = playerKey(p);
+        var entry = state.draft[key];
+        var assignedIdx = (entry && entry.team!=null) ? entry.team : null;
+        var rowClass = assignedIdx===null ? '' : (assignedIdx===state.myTeam ? 'mine' : 'drafted');
+        var vorClass = p.vor>=0 ? 'vor-pos' : 'vor-neg';
+        var projClass = p.projFpts>=p.fpts ? 'vor-pos' : 'vor-neg';
+        var projTitle = p.proj ? (p.proj.method+' · '+p.proj.gp+' GP') : '';
+        var options = '<option value="">Available</option>' + state.teamNames.map(function(name, idx){
+          var sel = assignedIdx===idx ? ' selected' : '';
+          var label = name + (idx===state.myTeam ? ' (Me)' : '');
+          return '<option value="'+idx+'"'+sel+'>'+escapeHtml(label)+'</option>';
+        }).join('');
+        var draftNowDisabled = assignedIdx!==null ? ' disabled' : '';
+        var statCells = STAT_COLUMNS.map(function(sc){
+          var applies = GOALIE_ONLY_KEYS[sc.key] ? isGoalie(p) : !isGoalie(p);
+          return '<td class="num mono">'+(applies ? fmt(p[sc.key]||0,0) : '<span class="db-empty">–</span>')+'</td>';
+        }).join('');
+        return '<tr class="'+rowClass+'">'+
+          '<td class="num rank-cell mono">'+(i+1)+'</td>'+
+          '<td class="name"><div class="name-row">'+
+            headshotHtml(key, p.name, p.posGroup)+
+            '<button class="draft-now-btn" data-key="'+encodeURIComponent(key)+'" data-draft-now="1"'+draftNowDisabled+' title="Draft to '+escapeHtml(state.teamNames[clock.idx]||'on-the-clock team')+'">+</button>'+
+            '<span class="name-text">'+escapeHtml(p.name)+
+              '<span class="team">'+teamLogoHtml(p.team)+teamChipHtml(p.team)+' '+escapeHtml(p.team||'')+'</span>'+
+            '</span>'+
+          '</div></td>'+
+          '<td><span class="pos-badge pos-'+p.posGroup+'">'+p.posGroup+'</span></td>'+
+          '<td class="num mono">'+(p.gp||0)+'</td>'+
+          statCells+
+          '<td class="num mono">'+fmt(p.fpts,1)+'</td>'+
+          '<td class="num mono">'+fmt(p.fpPerGp,2)+'</td>'+
+          '<td class="num mono '+projClass+'" title="'+escapeHtml(projTitle)+'">'+fmt(p.projFpts,1)+'</td>'+
+          '<td class="num mono '+vorClass+'">'+(p.vor>=0?'+':'')+fmt(p.vor,1)+'</td>'+
+          '<td><span class="tier tier-'+p.tier+'">'+p.tier+'</span></td>'+
+          '<td class="team-select"><select data-key="'+encodeURIComponent(key)+'">'+options+'</select></td>'+
+          '</tr>';
+      }).join('');
+
+      Array.prototype.forEach.call(tbody.querySelectorAll('td.team-select select'), function(sel){
+        sel.addEventListener('change', function(){
+          var key = decodeURIComponent(sel.getAttribute('data-key'));
+          assignPlayer(key, sel.value);
+        });
+      });
+      Array.prototype.forEach.call(tbody.querySelectorAll('[data-draft-now]'), function(btn){
+        btn.addEventListener('click', function(){
+          var key = decodeURIComponent(btn.getAttribute('data-key'));
+          assignPlayer(key, onClock().idx);
+        });
+      });
+    }
+
+    renderRosterGrid();
+    renderDraftBoard();
+  }
+
+  function renderDraftBoard(){
+    var wrap = document.getElementById('draftBoardWrap');
+    var r = state.settings.roster;
+    var teams = state.teamNames.length || 1;
+    var totalSlots = (r.c||0)+(r.lw||0)+(r.rw||0)+(r.d||0)+(r.g||0)+(r.benchSkaters||0)+(r.benchGoalies||0);
+    var picksMade = picksMadeCount();
+    var roundsNeeded = Math.max(totalSlots||1, Math.ceil((picksMade+1)/teams));
+    var clock = onClock();
+
+    var byKey = {};
+    (state.computed||[]).forEach(function(p){ byKey[playerKey(p)] = p; });
+    var grid = {};
+    Object.keys(state.draft).forEach(function(k){
+      var d = state.draft[k];
+      if(d && d.team!=null){
+        var round = Math.ceil(d.pick/teams);
+        grid[round+'-'+d.team] = { entry:d, player:byKey[k] };
+      }
+    });
+
+    var html = '<table class="draft-board"><thead><tr><th class="rnd-col">Rd</th>';
+    state.teamNames.forEach(function(name, idx){
+      html += '<th'+(idx===state.myTeam?' class="mine-col"':'')+'>'+escapeHtml(name)+(idx===state.myTeam?' <span class="my-team-badge">ME</span>':'')+'</th>';
+    });
+    html += '</tr></thead><tbody>';
+    for(var round=1; round<=roundsNeeded; round++){
+      html += '<tr><td class="rnd-col mono">R'+round+'</td>';
+      for(var t=0;t<teams;t++){
+        var cellData = grid[round+'-'+t];
+        var isClock = (clock.round===round && clock.idx===t);
+        var cls = 'db-cell'+(t===state.myTeam?' mine-col':'')+(isClock?' on-clock':'');
+        if(cellData && cellData.player){
+          var p = cellData.player;
+          html += '<td class="'+cls+' filled" style="background:var(--pos'+p.posGroup+')"><div class="db-pick">#'+cellData.entry.pick+'</div><div class="db-name">'+escapeHtml(p.name)+'</div><span class="pos-badge pos-'+p.posGroup+'">'+p.posGroup+'</span></td>';
+        } else if(isClock){
+          html += '<td class="'+cls+'"><div class="db-onclock">On<br>Clock</div></td>';
+        } else {
+          html += '<td class="'+cls+'"><span class="db-empty">—</span></td>';
+        }
+      }
+      html += '</tr>';
+    }
+    html += '</tbody></table>';
+    wrap.innerHTML = html;
+  }
+
+  function renderClock(){
+    var el = document.getElementById('clockBanner');
+    var c = onClock();
+    var teamName = state.teamNames[c.idx] || ('Team '+(c.idx+1));
+    el.innerHTML =
+      '<span class="pick-num mono">Pick '+c.pickNum+'</span>'+
+      '<span class="round-label">Round '+c.round+'</span>'+
+      '<span class="on-team">'+escapeHtml(teamName)+(c.idx===state.myTeam?' <span class="my-team-badge">ME</span>':'')+' on the clock</span>';
+  }
+
+  function renderRosterGrid(){
+    var grid = document.getElementById('rosterGrid');
+    var r = state.settings.roster;
+    var slotDefs = [['C',r.c||0],['LW',r.lw||0],['RW',r.rw||0],['D',r.d||0],['G',r.g||0]];
+    var byTeam = {};
+    (state.computed||[]).forEach(function(p){
+      var d = state.draft[playerKey(p)];
+      if(d && d.team!=null){
+        (byTeam[d.team] = byTeam[d.team]||[]).push(Object.assign({}, p, {pick:d.pick}));
+      }
+    });
+    grid.innerHTML = state.teamNames.map(function(name, idx){
+      var list = (byTeam[idx]||[]).slice().sort(function(a,b){ return a.pick-b.pick; });
+      var slotAssign = {}; slotDefs.forEach(function(sd){ slotAssign[sd[0]]=[]; });
+      var bench = [];
+      list.forEach(function(p){
+        var pg = p.posGroup, cap = slotAssign[pg] ? (r[pg.toLowerCase()]||0) : 0;
+        if(slotAssign[pg] && slotAssign[pg].length < cap){ slotAssign[pg].push(p.name); }
+        else{ bench.push(p.name+' ('+pg+')'); }
+      });
+      var benchCap = (r.benchSkaters||0) + (r.benchGoalies||0);
+      var lines = slotDefs.map(function(sd){
+        var pos=sd[0], cap=sd[1], names=slotAssign[pos];
+        return '<div class="slot-row"><div class="slot-head"><span>'+pos+'</span><span class="slot-fill">'+names.length+'/'+cap+'</span></div>'+
+          '<div class="slot-names">'+(names.length ? names.map(escapeHtml).join(', ') : '<span class="empty">—</span>')+'</div></div>';
+      }).join('') +
+      '<div class="slot-row"><div class="slot-head"><span>Bench</span><span class="slot-fill">'+bench.length+'/'+benchCap+'</span></div>'+
+      '<div class="slot-names">'+(bench.length ? bench.map(escapeHtml).join(', ') : '<span class="empty">—</span>')+'</div></div>';
+      return '<div class="roster-card'+(idx===state.myTeam?' mine':'')+'">'+
+        '<h4>'+escapeHtml(name)+(idx===state.myTeam?' <span class="my-team-badge">ME</span>':'')+'</h4>'+
+        lines+'</div>';
+    }).join('');
+  }
+
+  function renderTeamFields(){
+    var grid = document.getElementById('teamNameGrid');
+    grid.innerHTML = state.teamNames.map(function(name, idx){
+      return '<label class="field"><span>Team '+(idx+1)+'</span><input type="text" data-team-idx="'+idx+'" value="'+escapeHtml(name)+'"></label>';
+    }).join('');
+    var sel = document.getElementById('myTeamSelect');
+    sel.innerHTML = state.teamNames.map(function(name, idx){
+      return '<option value="'+idx+'"'+(idx===state.myTeam?' selected':'')+'>'+escapeHtml(name)+'</option>';
+    }).join('');
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  // ---------- Settings UI ----------
+  function buildSettingsFields(){
+    var sw = document.getElementById('skaterWeights');
+    sw.innerHTML = SKATER_KEYS.map(function(k){
+      return '<label class="field"><span>'+WEIGHT_LABELS[k]+'</span><input type="number" step="0.1" data-weight="'+k+'" value="'+state.settings.weights[k]+'"></label>';
+    }).join('');
+    var gw = document.getElementById('goalieWeights');
+    gw.innerHTML = GOALIE_KEYS.map(function(k){
+      return '<label class="field"><span>'+WEIGHT_LABELS[k]+'</span><input type="number" step="0.1" data-weight="'+k+'" value="'+state.settings.weights[k]+'"></label>';
+    }).join('');
+    var rf = document.getElementById('rosterFields');
+    rf.innerHTML = ROSTER_KEYS.map(function(k){
+      return '<label class="field"><span>'+ROSTER_LABELS[k]+'</span><input type="number" step="1" min="0" data-roster="'+k+'" value="'+state.settings.roster[k]+'"></label>';
+    }).join('');
+  }
+
+  function readSettingsFromForm(){
+    Array.prototype.forEach.call(document.querySelectorAll('[data-weight]'), function(inp){
+      state.settings.weights[inp.getAttribute('data-weight')] = parseFloat(inp.value)||0;
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-roster]'), function(inp){
+      state.settings.roster[inp.getAttribute('data-roster')] = parseInt(inp.value,10)||0;
+    });
+    saveSettings();
+    ensureTeamNames();
+    saveTeams();
+    renderTeamFields();
+    recompute();
+  }
+
+  // ---------- Draft Tracker UI ----------
+  function wireDraftPanel(){
+    document.getElementById('saveTeams').addEventListener('click', function(){
+      Array.prototype.forEach.call(document.querySelectorAll('[data-team-idx]'), function(inp){
+        var idx = parseInt(inp.getAttribute('data-team-idx'),10);
+        state.teamNames[idx] = inp.value.trim() || ('Team '+(idx+1));
+      });
+      state.myTeam = parseInt(document.getElementById('myTeamSelect').value,10) || 0;
+      saveTeams();
+      renderTeamFields();
+      render();
+    });
+    document.getElementById('undoPick').addEventListener('click', undoLastPick);
+    document.getElementById('resetDraft').addEventListener('click', resetDraft);
+  }
+
+  // ---------- Import ----------
+  function loadRows(rows){
+    state.players = rows;
+    savePlayers();
+    recompute();
+    document.getElementById('importPanel').removeAttribute('open');
+  }
+
+  function wireImport(){
+    document.getElementById('loadSample').addEventListener('click', function(){
+      var res = parseCsvText(SAMPLE_CSV);
+      loadRows(res.rows);
+      document.getElementById('parseStatus').textContent = 'Loaded '+res.rows.length+' players from real 2025-26 final stats.';
+    });
+    document.getElementById('downloadTemplate').addEventListener('click', function(){
+      var header = 'name,team,pos,gp,g,a,ppg,ppa,shg,sha,sog,hit,blk,pim,+/-,w,so,sv,ga\n';
+      var example = 'Connor McDavid,EDM,C,76,32,68,11,17,2,3,220,20,18,30,22,,,,\n';
+      var ta = document.getElementById('csvPaste');
+      ta.value = header+example;
+      ta.focus(); ta.select();
+      document.getElementById('parseStatus').textContent = 'Template loaded below — copy it into your spreadsheet tool, fill in rows, then paste back here.';
+    });
+    document.getElementById('parseCsv').addEventListener('click', function(){
+      var text = document.getElementById('csvPaste').value;
+      if(!text.trim()){ document.getElementById('parseStatus').textContent='Paste CSV text or choose a file first.'; return; }
+      var res = parseCsvText(text);
+      if(res.error){ document.getElementById('parseStatus').textContent = res.error; return; }
+      loadRows(res.rows);
+      document.getElementById('parseStatus').textContent = 'Loaded '+res.rows.length+' players.';
+    });
+    document.getElementById('csvFile').addEventListener('change', function(e){
+      var file = e.target.files[0];
+      if(!file) return;
+      var reader = new FileReader();
+      reader.onload = function(){
+        document.getElementById('csvPaste').value = reader.result;
+        var res = parseCsvText(reader.result);
+        if(res.error){ document.getElementById('parseStatus').textContent = res.error; return; }
+        loadRows(res.rows);
+        document.getElementById('parseStatus').textContent = 'Loaded '+res.rows.length+' players from '+file.name+'.';
+      };
+      reader.readAsText(file);
+    });
+  }
+
+  function wireToolbar(){
+    document.getElementById('search').addEventListener('input', function(e){
+      state.search = e.target.value;
+      render();
+    });
+    wireVoiceSearch();
+  }
+
+  function wireVoiceSearch(){
+    var micBtn = document.getElementById('micBtn');
+    var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if(!SpeechRecognition){
+      micBtn.disabled = true;
+      micBtn.title = 'Voice search is not supported in this browser';
+      micBtn.style.opacity = '.4';
+      return;
+    }
+    var recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    var listening = false;
+    recognition.onresult = function(e){
+      var transcript = e.results[0][0].transcript;
+      var searchInput = document.getElementById('search');
+      searchInput.value = transcript;
+      state.search = transcript;
+      render();
+    };
+    recognition.onend = function(){
+      listening = false;
+      micBtn.classList.remove('listening');
+    };
+    recognition.onerror = function(){
+      listening = false;
+      micBtn.classList.remove('listening');
+    };
+    micBtn.addEventListener('click', function(){
+      if(listening){ recognition.stop(); return; }
+      try{
+        recognition.start();
+        listening = true;
+        micBtn.classList.add('listening');
+      }catch(e){}
+    });
+  }
+
+  function wireSettings(){
+    document.getElementById('applySettings').addEventListener('click', readSettingsFromForm);
+    document.getElementById('resetSettings').addEventListener('click', function(){
+      state.settings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+      buildSettingsFields();
+      saveSettings();
+      ensureTeamNames();
+      saveTeams();
+      renderTeamFields();
+      recompute();
+    });
+  }
+
+  function init(){
+    load();
+    if(!state.players.length){
+      var res = parseCsvText(SAMPLE_CSV);
+      state.players = res.rows;
+    }
+    ensureTeamNames();
+    buildSettingsFields();
+    renderTeamFields();
+    wireImport();
+    wireToolbar();
+    wireSettings();
+    wireDraftPanel();
+    recompute();
+    loadPlayerIds();
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
