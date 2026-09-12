@@ -653,7 +653,10 @@ code{background:var(--surface-2); padding:1px 5px; border-radius:4px; font-famil
   // or for any player it doesn't cover, in which case avatarHtml() below is used instead.
   var PLAYER_IDS = {};
   function loadPlayerIds(){
-    fetch('player-ids.json').then(function(r){ return r.ok ? r.json() : {}; }).then(function(data){
+    // cache:'no-store' plus a cache-busting query param so an update to player-ids.json
+    // (new players, corrected IDs) shows up immediately rather than waiting out the
+    // CDN's cache lifetime on this static file.
+    fetch('player-ids.json?v='+Date.now(), {cache:'no-store'}).then(function(r){ return r.ok ? r.json() : {}; }).then(function(data){
       PLAYER_IDS = data || {};
       render();
     }).catch(function(){ /* file missing or not served — headshots just fall back to avatars */ });
