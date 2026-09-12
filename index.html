@@ -533,6 +533,12 @@ code{background:var(--surface-2); padding:1px 5px; border-radius:4px; font-famil
         <button class="ghost" id="undoPick">Undo Last Pick</button>
         <button class="ghost" id="resetDraft">Reset Draft</button>
       </div>
+      <div class="group-title">Import Existing Picks <span style="color:var(--faint); text-transform:none; letter-spacing:0; font-weight:400;">— catch the board up if you're joining a draft already in progress</span></div>
+      <textarea id="picksPaste" placeholder="One pick per line, in the order they happened, as:&#10;Player Name, Team Name&#10;&#10;e.g.&#10;Connor McDavid, Team 1&#10;Nathan MacKinnon, Team 2&#10;Cale Makar, Team 3"></textarea>
+      <div style="margin-top:10px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+        <button class="primary" id="importPicks">Import Picks</button>
+        <span class="filehint" id="importPicksStatus">Tip: send me a photo of the draft results in chat and I'll turn it into this list for you to paste in.</span>
+      </div>
       <div class="group-title">Team Rosters</div>
       <div class="roster-grid" id="rosterGrid"></div>
       <div class="group-title">Draft Board <span style="color:var(--faint); text-transform:none; letter-spacing:0; font-weight:400;">— filled squares are colored by the drafted player's position</span></div>
@@ -1030,6 +1036,58 @@ code{background:var(--surface-2); padding:1px 5px; border-radius:4px; font-famil
     saveDraft();
     saveTeams();
     render();
+  }
+
+  // ---------- Bulk pick import (catching up mid-draft) ----------
+  function normalizeName(s){
+    return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9 ]/g,'').replace(/\s+/g,' ').trim();
+  }
+  function findPlayerByName(name){
+    var norm = normalizeName(name);
+    if(!norm) return null;
+    var pool = state.computed || [];
+    var exact = pool.filter(function(p){ return normalizeName(p.name) === norm; });
+    if(exact.length===1) return exact[0];
+    if(exact.length>1) return exact[0]; // ambiguous duplicate name — take first, flagged by caller via team mismatch if wrong
+    var partial = pool.filter(function(p){
+      var pn = normalizeName(p.name);
+      return pn.indexOf(norm)!==-1 || norm.indexOf(pn)!==-1;
+    });
+    return partial.length===1 ? partial[0] : (partial.length>1 ? partial[0] : null);
+  }
+  function findTeamIndex(teamText){
+    var t = (teamText||'').trim();
+    if(!t) return -1;
+    var asNum = parseInt(t,10);
+    if(String(asNum)===t && asNum>=1 && asNum<=state.teamNames.length) return asNum-1;
+    var norm = t.toLowerCase();
+    var idx = state.teamNames.findIndex(function(n){ return n.toLowerCase()===norm; });
+    if(idx!==-1) return idx;
+    idx = state.teamNames.findIndex(function(n){ return n.toLowerCase().indexOf(norm)!==-1; });
+    return idx;
+  }
+  function importPicksFromText(text){
+    var lines = text.split(/\r\n|\n|\r/).map(function(l){ return l.trim(); }).filter(Boolean);
+    var matched = 0, failed = [];
+    lines.forEach(function(line){
+      var commaIdx = line.indexOf(',');
+      var colonIdx = line.indexOf(':');
+      var playerPart, teamPart;
+      if(commaIdx!==-1 && (colonIdx===-1 || commaIdx<colonIdx)){
+        playerPart = line.slice(0, commaIdx); teamPart = line.slice(commaIdx+1);
+      } else if(colonIdx!==-1){
+        teamPart = line.slice(0, colonIdx); playerPart = line.slice(colonIdx+1);
+      } else {
+        failed.push(line+' (no separator — use "Player, Team")'); return;
+      }
+      var player = findPlayerByName(playerPart);
+      var teamIdx = findTeamIndex(teamPart);
+      if(!player){ failed.push(line+' — player not found: "'+playerPart.trim()+'"'); return; }
+      if(teamIdx===-1){ failed.push(line+' — team not found: "'+teamPart.trim()+'"'); return; }
+      assignPlayer(playerKey(player), teamIdx);
+      matched++;
+    });
+    return { matched:matched, total:lines.length, failed:failed };
   }
 
   function playerKey(p){ return (p.name+'|'+p.team).toLowerCase(); }
@@ -1546,6 +1604,17 @@ code{background:var(--surface-2); padding:1px 5px; border-radius:4px; font-famil
     });
     document.getElementById('undoPick').addEventListener('click', undoLastPick);
     document.getElementById('resetDraft').addEventListener('click', resetDraft);
+    document.getElementById('importPicks').addEventListener('click', function(){
+      var text = document.getElementById('picksPaste').value;
+      var statusEl = document.getElementById('importPicksStatus');
+      if(!text.trim()){ statusEl.textContent = 'Paste a list of picks first.'; return; }
+      var res = importPicksFromText(text);
+      var status = 'Imported '+res.matched+' of '+res.total+' picks.';
+      if(res.failed.length){
+        status += ' Could not match: ' + res.failed.slice(0,5).join(' · ') + (res.failed.length>5 ? ' …' : '');
+      }
+      statusEl.textContent = status;
+    });
   }
 
   // ---------- Import ----------
