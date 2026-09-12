@@ -645,7 +645,7 @@ code{background:var(--surface-2); padding:1px 5px; border-radius:4px; font-famil
     var t = (team||'').toUpperCase();
     var code = ESPN_TEAM_CODE[t];
     if(!code) return '';
-    return '<img class="team-logo" src="https://a.espncdn.com/i/teamlogos/nhl/500/'+code+'.png" alt="" loading="lazy" onerror="this.remove()">';
+    return '<img class="team-logo" src="https://a.espncdn.com/i/teamlogos/nhl/500/'+code+'.png" alt="" onerror="this.remove()">';
   }
 
   // NHL playerId -> headshot mapping, loaded async from player-ids.json (see loadPlayerIds()).
@@ -669,7 +669,7 @@ code{background:var(--surface-2); padding:1px 5px; border-radius:4px; font-famil
     var id = PLAYER_IDS[key];
     if(!id) return avatarHtml(name, posGroup);
     var fallback = avatarHtml(name, posGroup).replace(/"/g, '&quot;');
-    return '<img class="avatar" style="object-fit:cover;" src="https://assets.nhle.com/mugs/nhl/latest/'+id+'@2x.png" alt="" loading="lazy" '+
+    return '<img class="avatar" style="object-fit:cover;" src="https://assets.nhle.com/mugs/nhl/latest/'+id+'@2x.png" alt="" '+
       'onerror="this.outerHTML=\''+fallback+'\'">';
   }
   function teamChipHtml(team){
